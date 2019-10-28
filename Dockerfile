@@ -30,6 +30,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl
 
 #This container can access the build artifacts inside the BUILD container.
 #Everything that is not copied is discarded
-COPY --from=BUILD /usr/src/app/target/transitlog-hfp-sink-jar-with-dependencies.jar /usr/app/transitlog-hfp-sink.jar
+COPY --from=BUILD /usr/src/app/target/transitlog-hfp-split-sink-jar-with-dependencies.jar /usr/app/transitlog-hfp-split-sink.jar
 
-ENTRYPOINT ["java", "-Xms256m", "-Xmx4096m", "-jar", "/usr/app/transitlog-hfp-sink.jar"]
+ENTRYPOINT ["java", "-Xms256m", "-Xmx4096m", "-jar", "/usr/app/transitlog-hfp-split-sink.jar"]

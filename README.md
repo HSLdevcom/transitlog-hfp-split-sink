@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/HSLdevcom/transitlog-hfp-sink.svg?branch=master)](https://travis-ci.org/HSLdevcom/transitlog-hfp-sink)
+[![Build Status](https://travis-ci.org/HSLdevcom/transitlog-hfp-split-sink.svg?branch=master)](https://travis-ci.org/HSLdevcom/transitlog-hfp-split-sink)
 
 ## Description
 
