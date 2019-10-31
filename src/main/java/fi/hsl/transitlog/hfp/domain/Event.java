@@ -35,16 +35,13 @@ public abstract class Event {
     private TableType tableType;
     private Timestamp tst;
     private String unique_vehicle_id;
-    @Enumerated(EnumType.STRING)
     private String event_type;
-    @Enumerated(EnumType.STRING)
     private String journey_type;
     private UUID uuid;
     private Timestamp received_at;
     private String topic_prefix;
     private String topic_version;
     private Boolean is_ongoing;
-    @Enumerated(value = EnumType.STRING)
     private String mode;
     private Integer owner_operator_id;
     private Integer vehicle_number;
@@ -75,11 +72,14 @@ public abstract class Event {
     private Integer line;
     private Time start;
     @Column(name = "loc")
-    @Enumerated(value = EnumType.STRING)
     private String location_quality_method;
     private Integer stop;
     private String route;
     private Integer occu;
+    private Integer seq; // new field
+    private Timestamp ttarr; // new field
+    private Timestamp ttdep; // new field
+    private Integer dr_type; // new field
 
     public Event(Hfp.Topic topic, Hfp.Payload payload, TableType tabletype) {
         this.tableType = tabletype;
@@ -128,6 +128,10 @@ public abstract class Event {
         this.stop = payload.hasStop() ? payload.getStop() : null;
         this.route = payload.hasRoute() ? payload.getRoute() : null;
         this.occu = payload.hasOccu() ? payload.getOccu() : null;
+        this.seq = payload.hasSeq() ? payload.getSeq() : null;
+        this.ttarr = payload.hasTtarr() ? HfpParser.safeParseTimestamp(payload.getTtarr()).get() : null;
+        this.ttdep = payload.hasTtarr() ? HfpParser.safeParseTimestamp(payload.getTtdep()).get() : null;
+        this.dr_type = payload.hasDrType() ? payload.getDrType() : null;
     }
 
     public Event() {
