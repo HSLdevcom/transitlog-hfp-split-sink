@@ -1,14 +1,11 @@
-package fi.hsl.transitlog.hfp;
+package fi.hsl.transitlog.hfp.persisthfpdata;
 
 import fi.hsl.common.hfp.proto.Hfp;
 import fi.hsl.common.pulsar.PulsarApplication;
 import fi.hsl.transitlog.hfp.domain.*;
-import fi.hsl.transitlog.hfp.domain.repositories.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.MessageId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +15,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Component
+public
 class DomainMappingWriter {
-
-    @Autowired
-    private EventRepository eventRepository;
 
     final HashMap<MessageId, VehiclePosition> vehiclePositionQueue;
     final HashMap<MessageId, StopEvent> stopEventQueue;
@@ -43,7 +37,7 @@ class DomainMappingWriter {
         unsignedEventQueue = new HashMap<>();
     }
 
-    static DomainMappingWriter newInstance(PulsarApplication app) {
+    public static DomainMappingWriter newInstance(PulsarApplication app) {
         DomainMappingWriter domainMappingWriter = new DomainMappingWriter(app);
         final long intervalInMs = app.getContext().getConfig().getDuration("application.dumpInterval", TimeUnit.MILLISECONDS);
         domainMappingWriter.startDumpExecutor(intervalInMs);
@@ -74,6 +68,16 @@ class DomainMappingWriter {
         log.error("To write vehiclepositions count: {}", vehiclePositionQueueCopy.size());
         // TODO: write messages here
         // TODO: ack written messages after successful write
+    }
+
+    public void close(boolean closePulsar) {
+        log.warn("Closing MessageProcessor resources");
+        scheduler.shutdown();
+        log.info("Scheduler shutdown finished");
+        if (closePulsar && application != null) {
+            log.info("Closing also Pulsar application");
+            application.close();
+        }
     }
 
     public void process(MessageId msgId, Hfp.Data data) {
@@ -132,15 +136,5 @@ class DomainMappingWriter {
                 })
                 .thenRun(() -> {
                 });
-    }
-
-    public void close(boolean closePulsar) {
-        log.warn("Closing MessageProcessor resources");
-        scheduler.shutdown();
-        log.info("Scheduler shutdown finished");
-        if (closePulsar && application != null) {
-            log.info("Closing also Pulsar application");
-            application.close();
-        }
     }
 }

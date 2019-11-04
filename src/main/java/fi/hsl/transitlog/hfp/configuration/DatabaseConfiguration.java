@@ -16,7 +16,7 @@ import java.util.HashMap;
 @Configuration
 @PropertySource({"classpath:application.properties"})
 @EnableJpaRepositories(
-        basePackages = "fi.hsl.domain.repositories",
+        basePackages = "fi.hsl.transitlog.hfp.domain.repositories",
         entityManagerFactoryRef = "devWriteEntityManager",
         transactionManagerRef = "devWriteTransactionManager"
 )
@@ -28,7 +28,7 @@ public class DatabaseConfiguration {
     @Bean
     @Primary
     public PlatformTransactionManager devWriteTransactionManager() {
-                JpaTransactionManager transactionManager
+        JpaTransactionManager transactionManager
                 = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(
                 devWriteEntityManager().getObject());
@@ -48,10 +48,15 @@ public class DatabaseConfiguration {
                 = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto",
-                env.getProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.dialect",
                 env.getProperty("hibernate.dialect"));
+        properties.put("hibernate.order_inserts", true);
+        properties.put("hibernate.jdbc.batch_size", 500);
+        properties.put("hibernate.order_updates", true);
+        properties.put("hibernate.jdbc.batch_versioned_data", true);
+        properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+        properties.put("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+        properties.put("hibernate.temp.use_jdbc_metadata_defaults", false);
         em.setJpaPropertyMap(properties);
 
         return em;
@@ -67,8 +72,6 @@ public class DatabaseConfiguration {
         dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
         dataSource.setUsername(env.getProperty("jdbc.user"));
         dataSource.setPassword(env.getProperty("jdbc.pass"));
-        dataSource.setAutoCommit(false);
-
         return dataSource;
     }
 }

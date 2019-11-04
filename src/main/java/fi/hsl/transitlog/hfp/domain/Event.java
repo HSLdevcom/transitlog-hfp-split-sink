@@ -7,10 +7,7 @@ import fi.hsl.common.hfp.proto.Hfp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -35,6 +32,7 @@ public abstract class Event {
     private String unique_vehicle_id;
     private String event_type;
     private String journey_type;
+    @Id
     private UUID uuid;
     private Timestamp received_at;
     private String topic_prefix;
@@ -93,8 +91,6 @@ public abstract class Event {
         this.route_id = topic.hasRouteId() ? topic.getRouteId() : null;
         this.direction_id = topic.hasDirectionId() ? topic.getDirectionId() : null;
         this.headsign = topic.hasHeadsign() ? topic.getHeadsign() : null;
-        Optional<Time> maybeStartTime = wrapToOptional(topic::hasStartTime, topic::getStartTime).flatMap(HfpParser::safeParseTime);
-        this.journey_start_time = maybeStartTime.orElse(null);
         this.next_stop_id = topic.hasNextStop() ? topic.getNextStop() : null;
         this.geohash_level = topic.hasGeohashLevel() ? topic.getGeohashLevel() : null;
         this.topic_latitude = topic.hasLatitude() ? topic.getLatitude() : null;
@@ -118,8 +114,6 @@ public abstract class Event {
         this.oday = maybeOperatingDay.orElse(null);
         this.jrn = payload.hasJrn() ? payload.getJrn() : null;
         this.line = payload.hasLine() ? payload.getLine() : null;
-        Optional<Time> maybeStartTimePayload = wrapToOptional(payload::hasStart, payload::getStart).flatMap(HfpParser::safeParseTime);
-        this.start = maybeStartTimePayload.orElse(null);
         this.location_quality_method = payload.hasLoc() ? payload.getLoc().toString() : null;
         this.stop = payload.hasStop() ? payload.getStop() : null;
         this.route = payload.hasRoute() ? payload.getRoute() : null;
@@ -128,13 +122,13 @@ public abstract class Event {
         this.dr_type = payload.hasDrType() ? payload.getDrType() : null;
     }
 
-    public Event() {
-    }
-
     static <T> Optional<T> wrapToOptional(Supplier<Boolean> isPresent, Supplier<T> getter) {
         if (isPresent.get()) {
             return Optional.of(getter.get());
         }
         return Optional.empty();
+    }
+
+    public Event() {
     }
 }
