@@ -31,8 +31,6 @@ import java.util.function.Supplier;
 })
 @Data
 public abstract class Event {
-    @JsonIgnore
-    private TableType tableType;
     private Timestamp tst;
     private String unique_vehicle_id;
     private String event_type;
@@ -77,12 +75,10 @@ public abstract class Event {
     private String route;
     private Integer occu;
     private Integer seq; // new field
-    private Timestamp ttarr; // new field
-    private Timestamp ttdep; // new field
     private Integer dr_type; // new field
 
     public Event(Hfp.Topic topic, Hfp.Payload payload, TableType tabletype) {
-        this.tableType = tabletype;
+        this.uuid = UUID.randomUUID();
         this.tst = payload.hasTst() ? HfpParser.safeParseTimestamp(payload.getTst()).get() : null;
         this.journey_type = topic.hasJourneyType() ? topic.getJourneyType().toString() : null;
         this.event_type = topic.hasEventType() ? topic.getEventType().toString() : null;
@@ -129,8 +125,6 @@ public abstract class Event {
         this.route = payload.hasRoute() ? payload.getRoute() : null;
         this.occu = payload.hasOccu() ? payload.getOccu() : null;
         this.seq = payload.hasSeq() ? payload.getSeq() : null;
-        this.ttarr = payload.hasTtarr() ? HfpParser.safeParseTimestamp(payload.getTtarr()).get() : null;
-        this.ttdep = payload.hasTtarr() ? HfpParser.safeParseTimestamp(payload.getTtdep()).get() : null;
         this.dr_type = payload.hasDrType() ? payload.getDrType() : null;
     }
 

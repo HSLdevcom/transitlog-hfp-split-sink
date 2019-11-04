@@ -3,28 +3,34 @@ package fi.hsl.transitlog.hfp;
 import fi.hsl.common.hfp.proto.Hfp;
 import fi.hsl.common.pulsar.PulsarApplication;
 import fi.hsl.transitlog.hfp.domain.*;
+import fi.hsl.transitlog.hfp.domain.repositories.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.MessageId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class DomainMappingWriter  {
+@Component
+class DomainMappingWriter {
 
-    private final Consumer<byte[]> consumer;
-    private final PulsarApplication application;
+    @Autowired
+    private EventRepository eventRepository;
+
     final HashMap<MessageId, VehiclePosition> vehiclePositionQueue;
     final HashMap<MessageId, StopEvent> stopEventQueue;
     final HashMap<MessageId, LightPriorityEvent> lightPriorityEventQueue;
     final HashMap<MessageId, OtherEvent> otherEventQueue;
     final HashMap<MessageId, UnsignedEvent> unsignedEventQueue;
-
+    private final Consumer<byte[]> consumer;
+    private final PulsarApplication application;
     ScheduledExecutorService scheduler;
 
     private DomainMappingWriter(PulsarApplication app) {
@@ -37,7 +43,7 @@ public class DomainMappingWriter  {
         unsignedEventQueue = new HashMap<>();
     }
 
-    public static DomainMappingWriter newInstance(PulsarApplication app) {
+    static DomainMappingWriter newInstance(PulsarApplication app) {
         DomainMappingWriter domainMappingWriter = new DomainMappingWriter(app);
         final long intervalInMs = app.getContext().getConfig().getDuration("application.dumpInterval", TimeUnit.MILLISECONDS);
         domainMappingWriter.startDumpExecutor(intervalInMs);
@@ -46,7 +52,7 @@ public class DomainMappingWriter  {
 
     void startDumpExecutor(long intervalInMs) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        log.info("Starting result-scheduler with dump interval of {} seconds", intervalInMs/1000);
+        log.info("Starting result-scheduler with dump interval of {} seconds", intervalInMs / 1000);
 
         scheduler.scheduleAtFixedRate(() -> {
             try {
@@ -60,7 +66,7 @@ public class DomainMappingWriter  {
 
     private void dump() throws Exception {
         log.debug("Saving results");
-        HashMap<MessageId, VehiclePosition> vehiclePositionQueueCopy;
+        Map<MessageId, VehiclePosition> vehiclePositionQueueCopy;
         synchronized (vehiclePositionQueue) {
             vehiclePositionQueueCopy = new HashMap<>(vehiclePositionQueue);
             vehiclePositionQueue.clear();
@@ -113,7 +119,7 @@ public class DomainMappingWriter  {
     }
 
     private void ackMessages(List<MessageId> messageIds) {
-        for (MessageId msgId: messageIds) {
+        for (MessageId msgId : messageIds) {
             ack(msgId);
         }
     }
@@ -124,7 +130,8 @@ public class DomainMappingWriter  {
                     log.error("Failed to ack Pulsar message", throwable);
                     return null;
                 })
-                .thenRun(() -> {});
+                .thenRun(() -> {
+                });
     }
 
     public void close(boolean closePulsar) {
