@@ -6,7 +6,9 @@ import fi.hsl.transitlog.hfp.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.MessageId;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,14 +17,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public
-class DomainMappingWriter {
+public class DomainMappingWriter {
 
-    final HashMap<MessageId, VehiclePosition> vehiclePositionQueue;
-    final HashMap<MessageId, StopEvent> stopEventQueue;
-    final HashMap<MessageId, LightPriorityEvent> lightPriorityEventQueue;
-    final HashMap<MessageId, OtherEvent> otherEventQueue;
-    final HashMap<MessageId, UnsignedEvent> unsignedEventQueue;
+    final HashMap<MessageId, Event> eventQueue;
     private final Consumer<byte[]> consumer;
     private final PulsarApplication application;
     ScheduledExecutorService scheduler;
@@ -30,11 +27,7 @@ class DomainMappingWriter {
     private DomainMappingWriter(PulsarApplication app) {
         consumer = app.getContext().getConsumer();
         application = app;
-        vehiclePositionQueue = new HashMap<>();
-        stopEventQueue = new HashMap<>();
-        lightPriorityEventQueue = new HashMap<>();
-        otherEventQueue = new HashMap<>();
-        unsignedEventQueue = new HashMap<>();
+        eventQueue = new HashMap<>();
     }
 
     public static DomainMappingWriter newInstance(PulsarApplication app) {
@@ -60,14 +53,16 @@ class DomainMappingWriter {
 
     private void dump() throws Exception {
         log.debug("Saving results");
-        Map<MessageId, VehiclePosition> vehiclePositionQueueCopy;
-        synchronized (vehiclePositionQueue) {
-            vehiclePositionQueueCopy = new HashMap<>(vehiclePositionQueue);
-            vehiclePositionQueue.clear();
+        Map<MessageId, Event> eventQueueCopy;
+        synchronized (eventQueue) {
+            eventQueueCopy = new HashMap<>(eventQueue);
+            eventQueue.clear();
         }
-        log.error("To write vehiclepositions count: {}", vehiclePositionQueueCopy.size());
-        // TODO: write messages here
-        // TODO: ack written messages after successful write
+        log.error("To write vehiclepositions count: {}", eventQueueCopy.size());
+        List<Event> events = new ArrayList<>(eventQueueCopy.values());
+        // TODO: write messages (events) here
+        List<MessageId> messageIds = new ArrayList<>(eventQueueCopy.keySet());
+        ackMessages(messageIds);
     }
 
     public void close(boolean closePulsar) {
@@ -85,10 +80,10 @@ class DomainMappingWriter {
             case VP:
                 switch (data.getTopic().getJourneyType()) {
                     case journey:
-                        vehiclePositionQueue.put(msgId, new VehiclePosition(data.getTopic(), data.getPayload()));
+                        eventQueue.put(msgId, new VehiclePosition(data.getTopic(), data.getPayload()));
                         break;
                     case deadrun:
-                        unsignedEventQueue.put(msgId, new UnsignedEvent(data.getTopic(), data.getPayload()));
+                        eventQueue.put(msgId, new UnsignedEvent(data.getTopic(), data.getPayload()));
                         break;
                     default:
                         log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
@@ -101,11 +96,11 @@ class DomainMappingWriter {
             case DEP:
             case PAS:
             case WAIT:
-                stopEventQueue.put(msgId, new StopEvent(data.getTopic(), data.getPayload()));
+                eventQueue.put(msgId, new StopEvent(data.getTopic(), data.getPayload()));
                 break;
             case TLR:
             case TLA:
-                lightPriorityEventQueue.put(msgId, new LightPriorityEvent(data.getTopic(), data.getPayload()));
+                eventQueue.put(msgId, new LightPriorityEvent(data.getTopic(), data.getPayload()));
                 break;
             case DOO:
             case DOC:
@@ -115,7 +110,7 @@ class DomainMappingWriter {
             case BOUT:
             case VJA:
             case VJOUT:
-                otherEventQueue.put(msgId, new OtherEvent(data.getTopic(), data.getPayload()));
+                eventQueue.put(msgId, new OtherEvent(data.getTopic(), data.getPayload()));
                 break;
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
