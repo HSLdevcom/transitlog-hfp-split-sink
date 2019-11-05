@@ -3,11 +3,15 @@ package fi.hsl.transitlog.hfp.persisthfpdata;
 import fi.hsl.common.hfp.proto.Hfp;
 import fi.hsl.common.pulsar.PulsarApplication;
 import fi.hsl.transitlog.hfp.domain.*;
+import fi.hsl.transitlog.hfp.domain.repositories.EventsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.MessageId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,24 +21,30 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Component
+@DependsOn(value = {"pulsarApplication"})
 public class DomainMappingWriter {
-
-    final HashMap<MessageId, Event> eventQueue;
-    private final Consumer<byte[]> consumer;
-    private final PulsarApplication application;
+    final Map<MessageId, Event> eventQueue;
     ScheduledExecutorService scheduler;
+    @Autowired
+    private EventsRepository eventsRepository;
+    @Autowired
+    private PulsarApplication pulsarApplication;
+    private Consumer<byte[]> consumer;
 
-    private DomainMappingWriter(PulsarApplication app) {
-        consumer = app.getContext().getConsumer();
-        application = app;
+
+    DomainMappingWriter() {
         eventQueue = new HashMap<>();
     }
 
-    public static DomainMappingWriter newInstance(PulsarApplication app) {
-        DomainMappingWriter domainMappingWriter = new DomainMappingWriter(app);
-        final long intervalInMs = app.getContext().getConfig().getDuration("application.dumpInterval", TimeUnit.MILLISECONDS);
-        domainMappingWriter.startDumpExecutor(intervalInMs);
-        return domainMappingWriter;
+    @PostConstruct
+    private void init() {
+        startMappingWriter();
+    }
+
+    private void startMappingWriter() {
+        final long intervalInMs = pulsarApplication.getContext().getConfig().getDuration("application.dumpInterval", TimeUnit.MILLISECONDS);
+        startDumpExecutor(intervalInMs);
     }
 
     void startDumpExecutor(long intervalInMs) {
@@ -65,13 +75,29 @@ public class DomainMappingWriter {
         ackMessages(messageIds);
     }
 
-    public void close(boolean closePulsar) {
+    private void ackMessages(List<MessageId> messageIds) {
+        for (MessageId msgId : messageIds) {
+            ack(msgId);
+        }
+    }
+
+    private void ack(MessageId received) {
+        consumer.acknowledgeAsync(received)
+                .exceptionally(throwable -> {
+                    log.error("Failed to ack Pulsar message", throwable);
+                    return null;
+                })
+                .thenRun(() -> {
+                });
+    }
+
+    void close(boolean closePulsar) {
         log.warn("Closing MessageProcessor resources");
         scheduler.shutdown();
         log.info("Scheduler shutdown finished");
-        if (closePulsar && application != null) {
+        if (closePulsar && pulsarApplication != null) {
             log.info("Closing also Pulsar application");
-            application.close();
+            pulsarApplication.close();
         }
     }
 
@@ -115,21 +141,5 @@ public class DomainMappingWriter {
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
-    }
-
-    private void ackMessages(List<MessageId> messageIds) {
-        for (MessageId msgId : messageIds) {
-            ack(msgId);
-        }
-    }
-
-    private void ack(MessageId received) {
-        consumer.acknowledgeAsync(received)
-                .exceptionally(throwable -> {
-                    log.error("Failed to ack Pulsar message", throwable);
-                    return null;
-                })
-                .thenRun(() -> {
-                });
     }
 }
