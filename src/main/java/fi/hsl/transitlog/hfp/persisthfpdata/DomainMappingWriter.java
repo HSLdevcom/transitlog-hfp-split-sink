@@ -9,6 +9,7 @@ import org.apache.pulsar.client.api.MessageId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -97,7 +98,8 @@ public class DomainMappingWriter {
         }
     }
 
-    private void dump() throws Exception {
+    @Transactional
+    void dump() throws Exception {
         log.debug("Saving results");
         Map<MessageId, Event> eventQueueCopy;
         synchronized (eventQueue) {
