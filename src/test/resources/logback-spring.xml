@@ -29,9 +29,6 @@
         <logger name="fi.hsl" level="info" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
-        <logger name="org.springframework" level="info" additivity="false">
-            <appender-ref ref="stdout"/>
-        </logger>
         <root level="info">
             <appender-ref ref="stdout"/>
         </root>

@@ -1,25 +1,31 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
 import fi.hsl.common.pulsar.PulsarApplication;
-import fi.hsl.transitlog.hfp.MessageProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 @Service
 @Slf4j
+@DependsOn(value = {"domainMappingWriter", "pulsarApplication", "messageProcessor"})
 public class PulsarListenerService {
-    @Autowired
     private DomainMappingWriter domainMappingWriter;
-    @Autowired
     private PulsarApplication pulsarApplication;
+    private MessageProcessor messageProcessor;
 
-    @PostConstruct
-    public void init() {
+    @Autowired
+    public PulsarListenerService(DomainMappingWriter domainMappingWriter, PulsarApplication pulsarApplication, MessageProcessor messageProcessor) {
+        this.domainMappingWriter = domainMappingWriter;
+        this.pulsarApplication = pulsarApplication;
+        this.messageProcessor = messageProcessor;
+    }
+
+    @Scheduled(fixedDelay = 1L)
+    public void schedulePulsarApplicationListener() {
         try {
-            pulsarApplication.launchWithHandler(new MessageProcessor(domainMappingWriter));
+            pulsarApplication.launchWithHandler(messageProcessor);
         } catch (Exception e) {
             log.error("Error launching pulsar application", e);
             if (domainMappingWriter != null) {

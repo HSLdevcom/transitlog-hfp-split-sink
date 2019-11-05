@@ -34,6 +34,8 @@ public abstract class Event {
     private String journey_type;
     @Id
     private UUID uuid;
+    @Version
+    private Long version;
     private Timestamp received_at;
     private String topic_prefix;
     private String topic_version;

@@ -6,12 +6,14 @@ import fi.hsl.common.pulsar.PulsarApplication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
 @Configuration
 @Slf4j
 @Retryable
+@Profile(value = {"dev", "default"})
 public class PulsarConfiguration {
     @Bean
     @Retryable(value = {Exception.class}, backoff = @Backoff(delay = 5000))
@@ -22,5 +24,4 @@ public class PulsarConfiguration {
         PulsarApplication pulsarApplication = PulsarApplication.newInstance(config);
         return pulsarApplication;
     }
-
 }
