@@ -320,7 +320,47 @@
         <modifyDataType tableName="lightpriorityevent" columnName="mode" newDataType="varchar(255)"></modifyDataType>
         <modifyDataType tableName="lightpriorityevent" columnName="loc"
                         newDataType="varchar(255)"></modifyDataType>
-
-
     </changeSet>
+
+    <changeSet id="add_tlr_fields" author="Joose Helle">
+        <addColumn tableName="lightpriorityevent">
+            <column name="tlp_requestid" type="integer"/>
+            <column name="tlp_requesttype" type="varchar(255)"/>
+            <column name="tlp_prioritylevel" type="varchar(255)"/>
+            <column name="tlp_reason" type="varchar(255)"/>
+            <column name="tlp_att_seq" type="integer"/>
+            <column name="tlp_decision" type="varchar(255)"/>
+            <column name="sid" type="integer"/>
+            <column name="signal_groupid" type="integer"/>
+            <column name="tlp_signalgroupnbr" type="integer"/>
+            <column name="tlp_line_configid" type="integer"/>
+            <column name="tlp_point_configid" type="integer"/>
+            <column name="tlp_frequency" type="integer"/>
+            <column name="tlp_protocol" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_seq_and_dr_type_fields" author="Joose Helle">
+        <addColumn tableName="lightpriorityevent">
+            <column name="seq" type="smallint"/>
+            <column name="dr_type" type="smallint"/>
+        </addColumn>
+        <addColumn tableName="otherevent">
+            <column name="seq" type="smallint"/>
+            <column name="dr_type" type="smallint"/>
+        </addColumn>
+        <addColumn tableName="stopevent">
+            <column name="seq" type="smallint"/>
+            <column name="dr_type" type="smallint"/>
+        </addColumn>
+        <addColumn tableName="unsignedevent">
+            <column name="seq" type="smallint"/>
+            <column name="dr_type" type="smallint"/>
+        </addColumn>
+        <addColumn tableName="vehicleposition">
+            <column name="seq" type="smallint"/>
+            <column name="dr_type" type="smallint"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
