@@ -72,8 +72,8 @@ public abstract class Event {
     private Integer stop;
     private String route;
     private Integer occu;
-    private Integer seq; // new field
-    private Integer dr_type; // new field
+    private Integer seq;
+    private Integer dr_type;
 
     public Event(Hfp.Topic topic, Hfp.Payload payload, TableType tabletype) {
         this.uuid = UUID.randomUUID();

@@ -17,7 +17,7 @@ public class LightPriorityEvent extends Event {
     private String tlp_decision;
     private Integer sid;
     private Integer signal_groupid;
-    private Integer ttlp_signalgroupnbr;
+    private Integer tlp_signalgroupnbr;
     private Integer tlp_line_configid;
     private Integer tlp_point_configid;
     private Integer tlp_frequency;
@@ -33,7 +33,7 @@ public class LightPriorityEvent extends Event {
         this.tlp_decision = payload.hasTlpDecision() ? payload.getTlpDecision().toString() : null;
         this.sid = payload.hasSid() ? payload.getSid() : null;
         this.signal_groupid = payload.hasSignalGroupid() ? payload.getSignalGroupid() : null;
-        this.ttlp_signalgroupnbr = payload.hasTlpSignalgroupnbr() ? payload.getTlpSignalgroupnbr() : null;
+        this.tlp_signalgroupnbr = payload.hasTlpSignalgroupnbr() ? payload.getTlpSignalgroupnbr() : null;
         this.tlp_line_configid = payload.hasTlpLineConfigid() ? payload.getTlpLineConfigid() : null;
         this.tlp_point_configid = payload.hasTlpPointConfigid() ? payload.getTlpPointConfigid() : null;
         this.tlp_frequency = payload.hasTlpFrequency() ? payload.getTlpFrequency() : null;
