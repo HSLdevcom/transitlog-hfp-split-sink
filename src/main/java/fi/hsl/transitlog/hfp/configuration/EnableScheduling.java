@@ -11,7 +11,7 @@ public class EnableScheduling {
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(4);
+        threadPoolTaskScheduler.setPoolSize(6);
         threadPoolTaskScheduler.initialize();
         return threadPoolTaskScheduler;
     }
