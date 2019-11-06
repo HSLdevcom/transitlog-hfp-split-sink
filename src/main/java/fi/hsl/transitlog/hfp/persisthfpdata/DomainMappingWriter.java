@@ -84,7 +84,7 @@ public class DomainMappingWriter {
     @Async
     public void attemptDump() {
         try {
-        List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
+            List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
             ackMessages(dumpedMessagedIds);
         } catch (Exception e) {
             log.error("Failed to check results, closing application", e);
