@@ -22,16 +22,16 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class DomainMappingWriter {
     final Map<MessageId, Event> eventQueue;
-    private final EntityManager entityManager;
     ScheduledExecutorService scheduler;
+    private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
 
 
     @Autowired
     DomainMappingWriter(PulsarApplication pulsarApplication, EntityManager entityManager) {
-        this.entityManager = entityManager;
         eventQueue = new HashMap<>();
+        this.entityManager = entityManager;
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
     }
@@ -79,6 +79,7 @@ public class DomainMappingWriter {
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
+    @Transactional
     public void attemptDump() {
         try {
             dump();
@@ -98,7 +99,6 @@ public class DomainMappingWriter {
         }
     }
 
-    @Transactional
     void dump() throws Exception {
         log.debug("Saving results");
         Map<MessageId, Event> eventQueueCopy;
