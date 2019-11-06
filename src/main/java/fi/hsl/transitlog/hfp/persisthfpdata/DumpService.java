@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,7 +26,8 @@ public class DumpService {
         log.debug("Saving results");
         Map<MessageId, Event> eventQueueCopy;
         synchronized (eventQueue) {
-            eventQueueCopy = new HashMap<>(eventQueue);
+            eventQueueCopy = eventQueue.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             eventQueue.clear();
         }
         log.error("To write vehiclepositions count: {}", eventQueueCopy.size());
