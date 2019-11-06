@@ -93,6 +93,8 @@ public abstract class Event {
         this.route_id = topic.hasRouteId() ? topic.getRouteId() : null;
         this.direction_id = topic.hasDirectionId() ? topic.getDirectionId() : null;
         this.headsign = topic.hasHeadsign() ? topic.getHeadsign() : null;
+        Optional<Time> maybeStartTime = wrapToOptional(topic::hasStartTime, topic::getStartTime).flatMap(HfpParser::safeParseTime);
+        this.journey_start_time = maybeStartTime.orElse(null);
         this.next_stop_id = topic.hasNextStop() ? topic.getNextStop() : null;
         this.geohash_level = topic.hasGeohashLevel() ? topic.getGeohashLevel() : null;
         this.topic_latitude = topic.hasLatitude() ? topic.getLatitude() : null;
@@ -116,6 +118,8 @@ public abstract class Event {
         this.oday = maybeOperatingDay.orElse(null);
         this.jrn = payload.hasJrn() ? payload.getJrn() : null;
         this.line = payload.hasLine() ? payload.getLine() : null;
+        Optional<Time> maybeStart = wrapToOptional(payload::hasStart, payload::getStart).flatMap(HfpParser::safeParseTime);
+        this.start = maybeStart.orElse(null);
         this.location_quality_method = payload.hasLoc() ? payload.getLoc().toString() : null;
         this.stop = payload.hasStop() ? payload.getStop() : null;
         this.route = payload.hasRoute() ? payload.getRoute() : null;
