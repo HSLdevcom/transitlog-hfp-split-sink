@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Slf4j
@@ -29,7 +30,7 @@ public class DomainMappingWriter {
 
     @Autowired
     DomainMappingWriter(PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask) {
-        eventQueue = new HashMap<>();
+        eventQueue = new ConcurrentHashMap<>();
         this.dumpTask = dumpTask;
         this.entityManager = entityManager;
         this.pulsarApplication = pulsarApplication;
