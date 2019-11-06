@@ -24,8 +24,6 @@ env:
     - BUILD_HASH=$(echo "${TRAVIS_COMMIT}" | cut -c1-7)
 
 before_install:
-  - echo ${DOCKER_USERNAME}
-  - echo ${DOCKER_PASSWORD}
   - docker --version
   - echo "ENV GIT_COMMIT ${TRAVIS_COMMIT}" >> Dockerfile
 
