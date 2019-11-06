@@ -9,10 +9,8 @@ import org.apache.pulsar.client.api.MessageId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class DomainMappingWriter {
     final Map<MessageId, Event> eventQueue;
+    private final DumpService dumpTask;
     ScheduledExecutorService scheduler;
     private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
@@ -29,8 +28,9 @@ public class DomainMappingWriter {
 
 
     @Autowired
-    DomainMappingWriter(PulsarApplication pulsarApplication, EntityManager entityManager) {
+    DomainMappingWriter(PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask) {
         eventQueue = new HashMap<>();
+        this.dumpTask = dumpTask;
         this.entityManager = entityManager;
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
@@ -79,10 +79,10 @@ public class DomainMappingWriter {
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
-    @Transactional
     public void attemptDump() {
         try {
-            dump();
+            List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
+            ackMessages(dumpedMessagedIds);
         } catch (Exception e) {
             log.error("Failed to check results, closing application", e);
             close(true);
@@ -97,21 +97,6 @@ public class DomainMappingWriter {
             log.info("Closing also Pulsar application");
             pulsarApplication.close();
         }
-    }
-
-    void dump() throws Exception {
-        log.debug("Saving results");
-        Map<MessageId, Event> eventQueueCopy;
-        synchronized (eventQueue) {
-            eventQueueCopy = new HashMap<>(eventQueue);
-            eventQueue.clear();
-        }
-        log.error("To write vehiclepositions count: {}", eventQueueCopy.size());
-        List<Event> events = new ArrayList<>(eventQueueCopy.values());
-        events.parallelStream()
-                .forEach(entityManager::persist);
-        List<MessageId> messageIds = new ArrayList<>(eventQueueCopy.keySet());
-        ackMessages(messageIds);
     }
 
     private void ackMessages(List<MessageId> messageIds) {

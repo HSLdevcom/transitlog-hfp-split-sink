@@ -362,5 +362,22 @@
             <column name="dr_type" type="smallint"/>
         </addColumn>
     </changeSet>
+    <changeSet id="add_version_column" author="Aki Väliaho">
+        <addColumn tableName="vehicleposition">
+            <column name="version" type="bigint"></column>
+        </addColumn>
+        <addColumn tableName="unsignedevent">
+            <column name="version" type="bigint"></column>
+        </addColumn>
+        <addColumn tableName="stopevent">
+            <column name="version" type="bigint"></column>
+        </addColumn>
+        <addColumn tableName="otherevent">
+            <column name="version" type="bigint"></column>
+        </addColumn>
+        <addColumn tableName="lightpriorityevent">
+            <column name="version" type="bigint"></column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
