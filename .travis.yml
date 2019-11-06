@@ -36,6 +36,7 @@ script:
   - set -e
   - ./.travis/check_semver
   - echo $DOCKER_LOCAL
+  - echo $DOCKER_DEV_TAG
   - docker build --tag "${DOCKER_LOCAL}" .
 
 # develop-branch pushes the image with "develop"-tag. Tagged commit will push the image with fully versioned tags
