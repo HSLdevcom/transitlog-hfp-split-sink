@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.MessageId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -79,9 +80,10 @@ public class DomainMappingWriter {
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
+    @Async
     public void attemptDump() {
         try {
-            List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
+        List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
             ackMessages(dumpedMessagedIds);
         } catch (Exception e) {
             log.error("Failed to check results, closing application", e);
