@@ -35,12 +35,11 @@ script:
   - mvn -f pom.xml clean install
   - set -e
   - ./.travis/check_semver
-  - docker build --tag "${DOCKER_LOCAL}" .
 
 # develop-branch pushes the image with "develop"-tag. Tagged commit will push the image with fully versioned tags
 deploy:
   - provider: script
-    script: sh ./.travis/docker_login_tag_push "${DOCKER_LOCAL}" "${DOCKER_DEV_TAG}"
+    script: sh ./.travis/docker_tag_push
     on:
       branch: develop
   - provider: script
