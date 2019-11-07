@@ -4,5 +4,7 @@ set -u
 #Use stdin with docker login to avoid unsecure usage of passwords
 echo "${DOCKER_PASSWORD}" \
   | docker login --username="${DOCKER_USERNAME}" --password-stdin
+#Build container
+docker build -t $DOCKER_DEVEL_TAG ../.
 docker push $DOCKER_DEVEL_TAG
 
