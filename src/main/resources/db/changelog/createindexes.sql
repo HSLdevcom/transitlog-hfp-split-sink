@@ -18,37 +18,37 @@ CREATE INDEX IF NOT EXISTS unsigned_events_vp_idx ON vehicleposition (tst ASC, j
 
 CREATE INDEX IF NOT EXISTS route_id_lp_idx ON lightpriorityevent (route_id);
 CREATE INDEX IF NOT EXISTS direction_id_lp_idx ON lightpriorityevent (direction_id);
-CREATE INDEX IF NOT EXISTS journey_lpart_time_lp_idx ON lightpriorityevent (journey_lpart_time);
+CREATE INDEX IF NOT EXISTS journey_staart_time_lp_idx ON lightpriorityevent (journey_start_time);
 CREATE INDEX IF NOT EXISTS unique_vehicle_id_lp_idx ON lightpriorityevent USING brin (unique_vehicle_id);
 CREATE INDEX IF NOT EXISTS oday_lp_idx ON lightpriorityevent USING brin (oday);
 CREATE INDEX IF NOT EXISTS lat_lp_idx ON lightpriorityevent (lat);
 CREATE INDEX IF NOT EXISTS long_lp_idx ON lightpriorityevent (long);
 CREATE INDEX IF NOT EXISTS tsi_lp_idx ON lightpriorityevent (tsi);
-CREATE INDEX IF NOT EXISTS next_lp_lpop_id_idx ON lightpriorityevent USING brin (next_lpop_id);
+CREATE INDEX IF NOT EXISTS next_lp_lpop_id_idx ON lightpriorityevent USING brin (next_stop_id);
 CREATE INDEX IF NOT EXISTS stop_lp_id_idx ON lightpriorityevent (stop);
 CREATE INDEX IF NOT EXISTS index10_lp ON lightpriorityevent (oday, geohash_level, unique_vehicle_id, vehicle_number, owner_operator_id);
 CREATE INDEX IF NOT EXISTS journey_type_lp_idx ON lightpriorityevent (journey_type);
 CREATE INDEX IF NOT EXISTS event_type_lp_idx ON lightpriorityevent (event_type);
 CREATE INDEX IF NOT EXISTS area_search_lp_idx ON lightpriorityevent (tst ASC, lat ASC, long ASC, journey_type, event_type);
-CREATE INDEX IF NOT EXISTS route_departures_lp_idx ON lightpriorityevent (event_type, oday, route_id, direction_id, stop, journey_lpart_time ASC, unique_vehicle_id ASC, tst DESC);
+CREATE INDEX IF NOT EXISTS route_departures_lp_idx ON lightpriorityevent (event_type, oday, route_id, direction_id, stop, journey_start_time ASC, unique_vehicle_id ASC, tst DESC);
 CREATE INDEX IF NOT EXISTS stop_departure_lp_idx ON lightpriorityevent (event_type, oday, stop);
 CREATE INDEX IF NOT EXISTS unsigned_events_lp_idx ON lightpriorityevent (tst ASC, journey_type, unique_vehicle_id);
 
 CREATE INDEX IF NOT EXISTS route_id_oe_idx ON otherevent (route_id);
 CREATE INDEX IF NOT EXISTS direction_id_oe_idx ON otherevent (direction_id);
-CREATE INDEX IF NOT EXISTS journey_oeart_time_oe_idx ON otherevent (journey_oeart_time);
+CREATE INDEX IF NOT EXISTS journey_start_time_oe_idx ON otherevent (journey_start_time);
 CREATE INDEX IF NOT EXISTS unique_vehicle_id_oe_idx ON otherevent USING brin (unique_vehicle_id);
 CREATE INDEX IF NOT EXISTS oday_oe_idx ON otherevent USING brin (oday);
 CREATE INDEX IF NOT EXISTS lat_oe_idx ON otherevent (lat);
 CREATE INDEX IF NOT EXISTS long_oe_idx ON otherevent (long);
 CREATE INDEX IF NOT EXISTS tsi_oe_idx ON otherevent (tsi);
-CREATE INDEX IF NOT EXISTS next_oe_oeop_id_idx ON otherevent USING brin (next_oeop_id);
+CREATE INDEX IF NOT EXISTS next_oe_stop_id_idx ON otherevent USING brin (next_stop_id);
 CREATE INDEX IF NOT EXISTS stop_oe_id_idx ON otherevent (stop);
 CREATE INDEX IF NOT EXISTS index10_oe ON otherevent (oday, geohash_level, unique_vehicle_id, vehicle_number, owner_operator_id);
 CREATE INDEX IF NOT EXISTS journey_type_oe_idx ON otherevent (journey_type);
 CREATE INDEX IF NOT EXISTS event_type_oe_idx ON otherevent (event_type);
 CREATE INDEX IF NOT EXISTS area_search_oe_idx ON otherevent (tst ASC, lat ASC, long ASC, journey_type, event_type);
-CREATE INDEX IF NOT EXISTS route_departures_oe_idx ON otherevent (event_type, oday, route_id, direction_id, stop, journey_oeart_time ASC, unique_vehicle_id ASC, tst DESC);
+CREATE INDEX IF NOT EXISTS route_departures_oe_idx ON otherevent (event_type, oday, route_id, direction_id, stop, journey_start_time ASC, unique_vehicle_id ASC, tst DESC);
 CREATE INDEX IF NOT EXISTS stop_departure_oe_idx ON otherevent (event_type, oday, stop);
 CREATE INDEX IF NOT EXISTS unsigned_events_oe_idx ON otherevent (tst ASC, journey_type, unique_vehicle_id);
 
