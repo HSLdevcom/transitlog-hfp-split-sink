@@ -1,6 +1,5 @@
 package fi.hsl.transitlog.hfp.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import fi.hsl.common.hfp.HfpParser;
 import fi.hsl.common.hfp.proto.Hfp;
@@ -77,7 +76,7 @@ public abstract class Event {
     private Integer seq;
     private Integer dr_type;
 
-    public Event(Hfp.Topic topic, Hfp.Payload payload, TableType tabletype) {
+    public Event(Hfp.Topic topic, Hfp.Payload payload) {
         this.uuid = UUID.randomUUID();
         this.tst = payload.hasTst() ? HfpParser.safeParseTimestamp(payload.getTst()).get() : null;
         this.journey_type = topic.hasJourneyType() ? topic.getJourneyType().toString() : null;

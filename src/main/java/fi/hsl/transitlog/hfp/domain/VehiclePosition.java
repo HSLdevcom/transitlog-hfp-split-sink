@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 @Entity
 public class VehiclePosition extends Event {
     public VehiclePosition(Hfp.Topic topic, Hfp.Payload payload) {
-        super(topic, payload, TableType.VEHICLEPOSITION);
+        super(topic, payload);
     }
 
     public VehiclePosition() {

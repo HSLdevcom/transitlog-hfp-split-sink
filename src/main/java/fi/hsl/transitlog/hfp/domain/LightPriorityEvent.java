@@ -3,7 +3,6 @@ import fi.hsl.common.hfp.proto.Hfp;
 
 import lombok.Data;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Data
 @Entity
@@ -24,7 +23,7 @@ public class LightPriorityEvent extends Event {
     private String tlp_protocol;
 
     public LightPriorityEvent(Hfp.Topic topic, Hfp.Payload payload) {
-        super(topic, payload, TableType.LIGHTPRIORITYEVENT);
+        super(topic, payload);
         this.tlp_requestid = payload.hasTlpRequestid() ? payload.getTlpRequestid() : null;
         this.tlp_requesttype = payload.hasTlpRequesttype() ? payload.getTlpRequesttype().toString() : null;
         this.tlp_prioritylevel = payload.hasTlpPrioritylevel() ? payload.getTlpPrioritylevel().toString() : null;
