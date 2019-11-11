@@ -379,5 +379,17 @@
             <column name="version" type="bigint"></column>
         </addColumn>
     </changeSet>
+    <!--Create indexes on new tables-->
+    <changeSet author="Aki Väliaho"
+               id="create_indexes_on_new_tables">
+        <sqlFile dbms="postgresql"
+                 encoding="UTF-8"
+                 endDelimiter="\n"
+                 path="createindexes.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
 
 </databaseChangeLog>
