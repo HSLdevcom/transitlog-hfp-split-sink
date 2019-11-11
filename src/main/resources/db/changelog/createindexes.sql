@@ -18,7 +18,7 @@ CREATE INDEX IF NOT EXISTS unsigned_events_vp_idx ON vehicleposition (tst ASC, j
 
 CREATE INDEX IF NOT EXISTS route_id_lp_idx ON lightpriorityevent (route_id);
 CREATE INDEX IF NOT EXISTS direction_id_lp_idx ON lightpriorityevent (direction_id);
-CREATE INDEX IF NOT EXISTS journey_lpart_time_lp_idx ON lightpriorityevent (journey_lpart_time);
+CREATE INDEX IF NOT EXISTS journey_staart_time_lp_idx ON lightpriorityevent (journey_start_time);
 CREATE INDEX IF NOT EXISTS unique_vehicle_id_lp_idx ON lightpriorityevent USING brin (unique_vehicle_id);
 CREATE INDEX IF NOT EXISTS oday_lp_idx ON lightpriorityevent USING brin (oday);
 CREATE INDEX IF NOT EXISTS lat_lp_idx ON lightpriorityevent (lat);
