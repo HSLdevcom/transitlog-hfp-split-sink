@@ -398,17 +398,17 @@
     </changeSet>
 
     <changeSet id="alter_timestamp_column_to_timestampz" author="Aki Väliaho">
-        <modifyDataType tableName="otherevent" columnName="tst" newDataType="timestampz"/>
-        <modifyDataType tableName="stopevent" columnName="tst" newDataType="timestampz"/>
-        <modifyDataType tableName="unsignedevent" columnName="tst" newDataType="timestampz"/>
-        <modifyDataType tableName="lightpriorityevent" columnName="tst" newDataType="timestampz"/>
-        <modifyDataType tableName="vehicleposition" columnName="tst" newDataType="timestampz"/>
+        <modifyDataType tableName="otherevent" columnName="tst" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="stopevent" columnName="tst" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="unsignedevent" columnName="tst" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="lightpriorityevent" columnName="tst" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="vehicleposition" columnName="tst" newDataType="timestamp with timezone"/>
 
-        <modifyDataType tableName="otherevent" columnName="received_at" newDataType="timestampz"/>
-        <modifyDataType tableName="stopevent" columnName="received_at" newDataType="timestampz"/>
-        <modifyDataType tableName="unsignedevent" columnName="received_at" newDataType="timestampz"/>
-        <modifyDataType tableName="lightpriorityevent" columnName="received_at" newDataType="timestampz"/>
-        <modifyDataType tableName="vehicleposition" columnName="received_at" newDataType="timestampz"/>
+        <modifyDataType tableName="otherevent" columnName="received_at" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="stopevent" columnName="received_at" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="unsignedevent" columnName="received_at" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="lightpriorityevent" columnName="received_at" newDataType="timestamp with timezone"/>
+        <modifyDataType tableName="vehicleposition" columnName="received_at" newDataType="timestamp with timezone"/>
     </changeSet>
 
 
