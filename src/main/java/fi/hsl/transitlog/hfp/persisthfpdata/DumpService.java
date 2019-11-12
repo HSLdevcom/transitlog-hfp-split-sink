@@ -29,7 +29,7 @@ public class DumpService {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             eventQueue.clear();
         }
-        log.debug("To write vehiclepositions count: {}", eventQueueCopy.size());
+        log.info("To write event count: {}", eventQueueCopy.size());
         List<Event> events = new ArrayList<>(eventQueueCopy.values());
         eventRepository.saveAll(events);
         return new ArrayList<>(eventQueueCopy.keySet());
