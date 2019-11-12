@@ -26,6 +26,7 @@ import java.util.function.Supplier;
         @JsonSubTypes.Type(value = UnsignedEvent.class, name = "unsignedevent")
 })
 @Data
+@Entity
 public abstract class Event {
     private Timestamp tst;
     private String unique_vehicle_id;

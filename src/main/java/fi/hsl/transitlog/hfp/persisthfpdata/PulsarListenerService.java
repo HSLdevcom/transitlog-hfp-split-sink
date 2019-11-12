@@ -22,7 +22,7 @@ public class PulsarListenerService {
         this.messageProcessor = messageProcessor;
     }
 
-    @Scheduled(fixedDelay = 1L)
+    @Scheduled(fixedDelay = 5000)
     public void schedulePulsarApplicationListener() {
         try {
             pulsarApplication.launchWithHandler(messageProcessor);
