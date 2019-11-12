@@ -398,6 +398,11 @@
     </changeSet>
 
     <changeSet id="alter_timestamp_column_to_timestampz" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="timestamp without time zone">SELECT DATA_TYPE FROM information_schema.columns
+                where TABLE_NAME = 'vehicleposition' AND column_name = 'tst'
+            </sqlCheck>
+        </preConditions>
         <sqlFile dbms="postgresql"
                  encoding="UTF-8"
                  endDelimiter="\n"
