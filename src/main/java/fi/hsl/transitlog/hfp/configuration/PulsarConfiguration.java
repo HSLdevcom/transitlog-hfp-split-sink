@@ -13,7 +13,7 @@ import org.springframework.retry.annotation.Retryable;
 @Configuration
 @Slf4j
 @Retryable
-@Profile(value = {"dev", "default"})
+@Profile(value = {"dev", "default", "integration-test"})
 public class PulsarConfiguration {
     @Bean
     @Retryable(value = {Exception.class}, backoff = @Backoff(delay = 5000))

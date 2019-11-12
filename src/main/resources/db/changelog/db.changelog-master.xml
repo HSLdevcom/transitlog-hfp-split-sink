@@ -215,6 +215,9 @@
         </createTable>
     </changeSet>
     <changeSet id="addPrimaryKey" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <changeSetExecuted id="addPrimaryKey" author="Aki Väliaho"/>
+        </preConditions>
         <addPrimaryKey tableName="vehicleposition"
                        columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
         <addPrimaryKey tableName="unsignedevent"
@@ -257,6 +260,9 @@
         </addColumn>
     </changeSet>
     <changeSet id="alter_enum_column_types" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <changeSetExecuted id="alter_enum_column_types" author="Aki Väliaho"/>
+        </preConditions>
         <modifyDataType tableName="vehicleposition" columnName="journey_type"
                         newDataType="journey_type"></modifyDataType>
         <modifyDataType tableName="vehicleposition" columnName="event_type" newDataType="event_type"></modifyDataType>
@@ -389,6 +395,20 @@
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="alter_timestamp_column_to_timestampz" author="Aki Väliaho">
+        <modifyDataType tableName="otherevent" columnName="tst" newDataType="timestampz"/>
+        <modifyDataType tableName="stopevent" columnName="tst" newDataType="timestampz"/>
+        <modifyDataType tableName="unsignedevent" columnName="tst" newDataType="timestampz"/>
+        <modifyDataType tableName="lightpriorityevent" columnName="tst" newDataType="timestampz"/>
+        <modifyDataType tableName="vehicleposition" columnName="tst" newDataType="timestampz"/>
+
+        <modifyDataType tableName="otherevent" columnName="received_at" newDataType="timestampz"/>
+        <modifyDataType tableName="stopevent" columnName="received_at" newDataType="timestampz"/>
+        <modifyDataType tableName="unsignedevent" columnName="received_at" newDataType="timestampz"/>
+        <modifyDataType tableName="lightpriorityevent" columnName="received_at" newDataType="timestampz"/>
+        <modifyDataType tableName="vehicleposition" columnName="received_at" newDataType="timestampz"/>
     </changeSet>
 
 
