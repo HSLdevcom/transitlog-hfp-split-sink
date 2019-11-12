@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ public class DumpService {
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             eventQueue.clear();
         }
-        log.info("To write vehiclepositions count: {}", eventQueueCopy.size());
+        log.debug("To write vehiclepositions count: {}", eventQueueCopy.size());
         List<Event> events = new ArrayList<>(eventQueueCopy.values());
         eventRepository.saveAll(events);
         return new ArrayList<>(eventQueueCopy.keySet());
