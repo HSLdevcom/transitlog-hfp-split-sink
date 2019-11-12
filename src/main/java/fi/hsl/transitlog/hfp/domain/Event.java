@@ -6,7 +6,10 @@ import fi.hsl.common.hfp.proto.Hfp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -26,7 +29,6 @@ import java.util.function.Supplier;
         @JsonSubTypes.Type(value = UnsignedEvent.class, name = "unsignedevent")
 })
 @Data
-@Entity
 public abstract class Event {
     private Timestamp tst;
     private String unique_vehicle_id;
