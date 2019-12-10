@@ -1,0 +1,7 @@
+#!/bin/sh
+set -u
+
+#Use stdin with docker login to avoid unsecure usage of passwords
+echo "${DOCKER_PASSWORD}" \
+  | docker login --username="${DOCKER_USERNAME}" --password-stdin
+docker push $DOCKER_DEVEL_TAG
