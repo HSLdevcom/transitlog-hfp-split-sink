@@ -3,6 +3,11 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
     <changeSet id="add_event_tables" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lightpriorityevent"/>
+            </not>
+        </preConditions>
         <createTable tableName="lightpriorityevent">
             <column name="id" type="double"></column>
             <column name="topic_prefix" type="varchar(255)"></column>
@@ -214,23 +219,11 @@
             <column name="occu" type="smallint"></column>
         </createTable>
     </changeSet>
-    <changeSet id="addPrimaryKey" author="Aki Väliaho">
-        <preConditions onFail="MARK_RAN">
-            <changeSetExecuted id="addPrimaryKey" author="Aki Väliaho"/>
-        </preConditions>
-        <addPrimaryKey tableName="vehicleposition"
-                       columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
-        <addPrimaryKey tableName="unsignedevent"
-                       columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
-        <addPrimaryKey tableName="stopevent"
-                       columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
-        <addPrimaryKey tableName="otherevent"
-                       columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
-        <addPrimaryKey tableName="lightpriorityevent"
-                       columnNames="uniquie_vehicle_id, tst, event_type, journey_type"></addPrimaryKey>
-    </changeSet>
 
     <changeSet id="renameUnique_vehicle_id_column" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="vehicleposition" columnName="uniquie_vehicle_id"/>
+        </preConditions>
         <renameColumn tableName="vehicleposition" oldColumnName="uniquie_vehicle_id"
                       newColumnName="unique_vehicle_id"></renameColumn>
         <renameColumn tableName="unsignedevent" oldColumnName="uniquie_vehicle_id"
@@ -243,6 +236,11 @@
                       newColumnName="unique_vehicle_id"></renameColumn>
     </changeSet>
     <changeSet id="addreveived_at_column" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="vehicleposition" columnName="received_at"/>
+            </not>
+        </preConditions>
         <addColumn tableName="vehicleposition">
             <column type="timestamp" name="received_at"></column>
         </addColumn>
@@ -261,7 +259,9 @@
     </changeSet>
     <changeSet id="alter_enum_column_types" author="Aki Väliaho">
         <preConditions onFail="MARK_RAN">
-            <changeSetExecuted id="alter_enum_column_types" author="Aki Väliaho"/>
+            <sqlCheck expectedResult="journey_type">SELECT DATA_TYPE FROM information_schema.columns
+                where TABLE_NAME = 'vehicleposition' AND column_name = 'journey_type'
+            </sqlCheck>
         </preConditions>
         <modifyDataType tableName="vehicleposition" columnName="journey_type"
                         newDataType="journey_type"></modifyDataType>
@@ -296,6 +296,11 @@
     </changeSet>
 
     <changeSet id="modify_enum_data_type" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="journey_type">SELECT DATA_TYPE FROM information_schema.columns
+                where TABLE_NAME = 'vehicleposition' AND column_name = 'journey_type'
+            </sqlCheck>
+        </preConditions>
         <modifyDataType tableName="vehicleposition" columnName="journey_type"
                         newDataType="varchar(255)"></modifyDataType>
         <modifyDataType tableName="vehicleposition" columnName="event_type" newDataType="varchar(255)"></modifyDataType>
@@ -329,6 +334,11 @@
     </changeSet>
 
     <changeSet id="add_tlr_fields" author="Joose Helle">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="lightpriorityevent" columnName="tlp_requestid"/>
+            </not>
+        </preConditions>
         <addColumn tableName="lightpriorityevent">
             <column name="tlp_requestid" type="integer"/>
             <column name="tlp_requesttype" type="varchar(255)"/>
@@ -347,6 +357,11 @@
     </changeSet>
 
     <changeSet id="add_seq_and_dr_type_fields" author="Joose Helle">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="lightpriorityevent" columnName="seq"/>
+            </not>
+        </preConditions>
         <addColumn tableName="lightpriorityevent">
             <column name="seq" type="smallint"/>
             <column name="dr_type" type="smallint"/>
@@ -369,6 +384,11 @@
         </addColumn>
     </changeSet>
     <changeSet id="add_version_column" author="Aki Väliaho">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="vehicleposition" columnName="version"/>
+            </not>
+        </preConditions>
         <addColumn tableName="vehicleposition">
             <column name="version" type="bigint"></column>
         </addColumn>
@@ -385,18 +405,6 @@
             <column name="version" type="bigint"></column>
         </addColumn>
     </changeSet>
-    <!--Create indexes on new tables-->
-    <changeSet author="Aki Väliaho"
-               id="create_indexes_on_new_tables">
-        <sqlFile dbms="postgresql"
-                 encoding="UTF-8"
-                 endDelimiter="\n"
-                 path="createindexes.sql"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-    </changeSet>
-
     <changeSet id="alter_timestamp_column_to_timestampz" author="Aki Väliaho">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="timestamp without time zone">SELECT DATA_TYPE FROM information_schema.columns
