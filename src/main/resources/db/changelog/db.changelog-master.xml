@@ -419,6 +419,55 @@
                  splitStatements="true"
                  stripComments="true"/>
     </changeSet>
+    <changeSet id="add_cancellation_table_to_changelog" author="Joose Helle">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="cancellation"/>
+            </not>
+        </preConditions>
+        <sql>CREATE TYPE cancellation_status AS ENUM ('RUNNING', 'CANCELED');
+        </sql>
+        <createTable tableName="cancellation">
+            <column name="id" type="integer"></column>
+            <column name="created_at" type="timestamptz"></column>
+            <column name="modified_at" type="timestamptz"></column>
+            <column name="status" type="cancellation_status"></column>
+            <column name="start_date" type="date"></column>
+            <column name="route_id" type="varchar(255)"></column>
+            <column name="direction_id" type="smallint"></column>
+            <column name="start_time" type="varchar(255)"></column>
+            <column name="last_modified" type="timestamptz"></column>
+            <column name="json_schema_version" type="smallint"></column>
+            <column name="data" type="jsonb"></column>
+            <column name="ext_id_dvj" type="varchar(255)"></column>
+        </createTable>
+    </changeSet>
 
+    <changeSet id="add_stopcancellation_table" author="Joose Helle">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="stopcancellation"/>
+            </not>
+        </preConditions>
+        <sql>CREATE TYPE stop_cancellation_status AS ENUM ('SCHEDULED', 'SKIPPED');
+        </sql>
+        <sql>CREATE TYPE stop_estimate_type AS ENUM ('ARRIVAL', 'DEPARTURE');
+        </sql>
+        <createTable tableName="stopcancellation">
+            <column name="id" type="integer"></column>
+            <column name="created_at" type="timestamptz"></column>
+            <column name="modified_at" type="timestamptz"></column>
+            <column name="status" type="stop_cancellation_status"></column>
+            <column name="stop_estimate_type" type="stop_estimate_type"></column>
+            <column name="operating_date" type="date"></column>
+            <column name="route_id" type="varchar(255)"></column>
+            <column name="direction_id" type="smallint"></column>
+            <column name="start_time" type="varchar(255)"></column>
+            <column name="stop_id" type="varchar(255)"></column>
+            <column name="stop_sequence" type="smallint"></column>
+            <column name="last_modified" type="timestamptz"></column>
+            <column name="ext_id_dvj" type="varchar(255)"></column>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>
