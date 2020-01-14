@@ -420,5 +420,6 @@
                  stripComments="true"/>
     </changeSet>
     <include file="db.add_cancellation_tables.xml" relativeToChangelogFile="true"></include>
+    <include file="db.add_alert_table.xml" relativeToChangelogFile="true"></include>
 
 </databaseChangeLog>
