@@ -18,9 +18,11 @@
             NO CYCLE;
         </sql>
         <createTable tableName="alert">
-            <column name="id" type="integer" defaultValue="nextval('alert_id_seq'::regclass)"></column>
-            <column name="created_at" type="timestamptz" defaultValue="CURRENT_TIMESTAMP"></column>
-            <column name="modified_at" type="timestamptz" defaultValue="CURRENT_TIMESTAMP"></column>
+            <column name="id" type="bigserial" defaultValue="nextval('alert_id_seq'::regclass)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()"></column>
+            <column name="modified_at" type="timestamptz" defaultValueComputed="now()"></column>
             <column name="route_id" type="varchar(255)"></column>
             <column name="stop_id" type="varchar(255)"></column>
             <column name="affects_all_routes" type="boolean"></column>

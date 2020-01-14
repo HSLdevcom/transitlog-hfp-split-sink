@@ -3,7 +3,7 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <changeSet id="add_cancellation_table_to_changelog" author="Joose Helle">
+    <changeSet id="add_cancellation_table" author="Joose Helle">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="cancellation"/>
@@ -11,17 +11,27 @@
         </preConditions>
         <sql>CREATE TYPE cancellation_status AS ENUM ('RUNNING', 'CANCELED');
         </sql>
+        <sql>CREATE SEQUENCE public.cancellation_id_seq
+            INCREMENT BY 1
+            MINVALUE 1
+            MAXVALUE 9223372036854775807
+            START 1
+            CACHE 1
+            NO CYCLE;
+        </sql>
         <createTable tableName="cancellation">
-            <column name="id" type="integer"></column>
-            <column name="created_at" type="timestamptz"></column>
-            <column name="modified_at" type="timestamptz"></column>
+            <column name="id" type="bigserial" defaultValue="nextval('cancellation_id_seq'::regclass)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()"></column>
+            <column name="modified_at" type="timestamptz" defaultValueComputed="now()"></column>
             <column name="status" type="cancellation_status"></column>
             <column name="start_date" type="date"></column>
             <column name="route_id" type="varchar(255)"></column>
             <column name="direction_id" type="smallint"></column>
             <column name="start_time" type="varchar(255)"></column>
             <column name="last_modified" type="timestamptz"></column>
-            <column name="json_schema_version" type="smallint"></column>
+            <column name="json_schema_version" type="smallint" defaultValueNumeric="1"></column>
             <column name="data" type="jsonb"></column>
             <column name="ext_id_dvj" type="varchar(255)"></column>
         </createTable>
@@ -32,20 +42,30 @@
         </sql>
     </changeSet>
 
-    <changeSet id="add_stopcancellation_table" author="Joose Helle">
+    <changeSet id="add_stopcancellation_table_v2" author="Joose Helle">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="stopcancellation"/>
             </not>
         </preConditions>
-        <sql>CREATE TYPE stop_cancellation_status AS ENUM ('SCHEDULED', 'SKIPPED');
+        <sql>CREATE SEQUENCE public.stopcancellation_id_seq
+            INCREMENT BY 1
+            MINVALUE 1
+            MAXVALUE 9223372036854775807
+            START 1
+            CACHE 1
+            NO CYCLE;
+        </sql>
+        <sql>CREATE TYPE stopcancellation_status AS ENUM ('SCHEDULED', 'SKIPPED');
             CREATE TYPE stop_estimate_type AS ENUM ('ARRIVAL', 'DEPARTURE');
         </sql>
         <createTable tableName="stopcancellation">
-            <column name="id" type="integer"></column>
-            <column name="created_at" type="timestamptz"></column>
-            <column name="modified_at" type="timestamptz"></column>
-            <column name="status" type="stop_cancellation_status"></column>
+            <column name="id" type="bigserial" defaultValue="nextval('stopcancellation_id_seq'::regclass)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="now()"></column>
+            <column name="modified_at" type="timestamptz" defaultValueComputed="now()"></column>
+            <column name="status" type="stopcancellation_status"></column>
             <column name="stop_estimate_type" type="stop_estimate_type"></column>
             <column name="operating_date" type="date"></column>
             <column name="route_id" type="varchar(255)"></column>
