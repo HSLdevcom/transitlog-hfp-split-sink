@@ -34,6 +34,39 @@ class LazyBlobstorageTest extends AbstractPodamTest {
     }
 
     @Test
+    void uploadOtherEvent() throws IOException {
+        OtherEvent otherEvent = podamFactory.manufacturePojo(OtherEvent.class);
+        String createdFile = this.lazyBlobStorage.uploadBlob(otherEvent);
+        verifyFileDeleted(createdFile);
+    }
+
+    private void verifyFileDeleted(String createdFile) {
+        await()
+                .atMost(60, TimeUnit.SECONDS)
+                .pollDelay(1, TimeUnit.SECONDS)
+                .untilAsserted(() -> assertTrue("File is not deleted", !file.exists()));
+        File file = new File(createdFile);
+        file.delete();
+        file.getParentFile().delete();
+    }
+
+    @Test
+    void uploadUnsignedEvent() throws IOException {
+        UnsignedEvent unsignedEvent = podamFactory.manufacturePojo(UnsignedEvent.class);
+        String createdFile = this.lazyBlobStorage.uploadBlob(unsignedEvent);
+        verifyFileDeleted(createdFile);
+    }
+
+    @Test
+    void uploadLightPriorityEvent() throws IOException {
+        LightPriorityEvent lightPriorityEvent = podamFactory.manufacturePojo(LightPriorityEvent.class);
+        String createdFile = this.lazyBlobStorage.uploadBlob(lightPriorityEvent);
+        //Await to see file is actually deleted after a brief period of time
+        verifyFileDeleted(createdFile);
+
+    }
+
+    @Test
     void uploadBlob() throws IOException {
         VehiclePosition vehiclePosition = podamFactory.manufacturePojo(VehiclePosition.class);
         String createdFile = this.lazyBlobStorage.uploadBlob(vehiclePosition);
