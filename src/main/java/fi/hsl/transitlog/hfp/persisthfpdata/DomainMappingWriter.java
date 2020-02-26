@@ -1,28 +1,27 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
-import fi.hsl.common.hfp.proto.Hfp;
-import fi.hsl.common.pulsar.PulsarApplication;
+import fi.hsl.common.hfp.proto.*;
+import fi.hsl.common.pulsar.*;
 import fi.hsl.transitlog.hfp.domain.*;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.pulsar.client.api.Consumer;
-import org.apache.pulsar.client.api.MessageId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import fi.hsl.transitlog.hfp.persisthfpdata.azure.*;
+import lombok.extern.slf4j.*;
+import org.apache.pulsar.client.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.scheduling.annotation.*;
+import org.springframework.stereotype.*;
 
-import javax.persistence.EntityManager;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
+import javax.persistence.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 @Slf4j
 @Component
 public class DomainMappingWriter {
     final Map<MessageId, Event> eventQueue;
     private final DumpService dumpTask;
+    private final BlobStorageInterface blobStorageInterface;
+    private final EventFactory eventFactory;
     ScheduledExecutorService scheduler;
     private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
@@ -30,23 +29,28 @@ public class DomainMappingWriter {
 
 
     @Autowired
-    DomainMappingWriter(PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask) {
+    DomainMappingWriter(BlobStorageInterface blobStorageInterface, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
+        this.blobStorageInterface = blobStorageInterface;
         eventQueue = new ConcurrentHashMap<>();
         this.dumpTask = dumpTask;
         this.entityManager = entityManager;
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
+        this.eventFactory = eventFactory;
     }
 
-    void process(MessageId msgId, Hfp.Data data) {
+    void process(MessageId msgId, Hfp.Data data) throws IOException {
+        Event event = null;
         switch (data.getTopic().getEventType()) {
             case VP:
                 switch (data.getTopic().getJourneyType()) {
                     case journey:
-                        eventQueue.put(msgId, new VehiclePosition(data.getTopic(), data.getPayload()));
+                        event = eventFactory.createVehiclePositionEvent(data.getTopic(), data.getPayload());
+                        eventQueue.put(msgId, event);
                         break;
                     case deadrun:
-                        eventQueue.put(msgId, new UnsignedEvent(data.getTopic(), data.getPayload()));
+                        event = eventFactory.createUnsignedEvent(data.getTopic(), data.getPayload());
+                        eventQueue.put(msgId, event);
                         break;
                     default:
                         log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
@@ -59,11 +63,13 @@ public class DomainMappingWriter {
             case DEP:
             case PAS:
             case WAIT:
-                eventQueue.put(msgId, new StopEvent(data.getTopic(), data.getPayload()));
+                event = eventFactory.createStopEvent(data.getTopic(), data.getPayload());
+                eventQueue.put(msgId, event);
                 break;
             case TLR:
             case TLA:
-                eventQueue.put(msgId, new LightPriorityEvent(data.getTopic(), data.getPayload()));
+                event = eventFactory.createLightPriorityEvent(data.getTopic(), data.getPayload());
+                eventQueue.put(msgId, event);
                 break;
             case DOO:
             case DOC:
@@ -73,11 +79,13 @@ public class DomainMappingWriter {
             case BOUT:
             case VJA:
             case VJOUT:
-                eventQueue.put(msgId, new OtherEvent(data.getTopic(), data.getPayload()));
+                event = eventFactory.createOtherEvent(data.getTopic(), data.getPayload());
+                eventQueue.put(msgId, event);
                 break;
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
+        blobStorageInterface.uploadBlob(event);
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
@@ -92,6 +100,12 @@ public class DomainMappingWriter {
         }
     }
 
+    private void ackMessages(List<MessageId> messageIds) {
+        for (MessageId msgId : messageIds) {
+            ack(msgId);
+        }
+    }
+
     void close(boolean closePulsar) {
         log.warn("Closing MessageProcessor resources");
         scheduler.shutdown();
@@ -99,12 +113,6 @@ public class DomainMappingWriter {
         if (closePulsar && pulsarApplication != null) {
             log.info("Closing also Pulsar application");
             pulsarApplication.close();
-        }
-    }
-
-    private void ackMessages(List<MessageId> messageIds) {
-        for (MessageId msgId : messageIds) {
-            ack(msgId);
         }
     }
 

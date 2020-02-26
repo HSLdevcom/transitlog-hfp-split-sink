@@ -1,17 +1,15 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
-import fi.hsl.transitlog.hfp.domain.Event;
-import fi.hsl.transitlog.hfp.domain.repositories.EventRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.pulsar.client.api.MessageId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import fi.hsl.transitlog.hfp.domain.*;
+import fi.hsl.transitlog.hfp.domain.repositories.*;
+import lombok.extern.slf4j.*;
+import org.apache.pulsar.client.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 @Slf4j
@@ -21,7 +19,7 @@ public class DumpService {
     private EventRepository eventRepository;
 
     @Transactional
-    public List<MessageId> dump(Map<MessageId, Event> eventQueue) {
+    List<MessageId> dump(Map<MessageId, Event> eventQueue) {
         log.debug("Saving results");
         Map<MessageId, Event> eventQueueCopy;
         synchronized (eventQueue) {
