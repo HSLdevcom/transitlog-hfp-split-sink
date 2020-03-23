@@ -1,23 +1,18 @@
 package fi.hsl.transitlog.hfp.domain;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import fi.hsl.common.hfp.HfpParser;
-import fi.hsl.common.hfp.proto.Hfp;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.*;
+import fi.hsl.common.hfp.*;
+import fi.hsl.common.hfp.proto.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
+import javax.persistence.*;
+import java.math.*;
+import java.sql.*;
+import java.time.*;
 import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 
 @MappedSuperclass
 @EqualsAndHashCode
@@ -29,6 +24,7 @@ import java.util.function.Supplier;
         @JsonSubTypes.Type(value = UnsignedEvent.class, name = "unsignedevent")
 })
 @Data
+@Slf4j
 public abstract class Event {
     private Timestamp tst;
     private String unique_vehicle_id;
@@ -81,7 +77,7 @@ public abstract class Event {
 
     public Event(Hfp.Topic topic, Hfp.Payload payload) {
         this.uuid = UUID.randomUUID();
-        this.tst = payload.hasTst() ? HfpParser.safeParseTimestamp(payload.getTst()).get() : null;
+        this.tst = payload.hasTst() ? safeParse(payload.getTst()).get() : null;
         this.journey_type = topic.hasJourneyType() ? topic.getJourneyType().toString() : null;
         this.event_type = topic.hasEventType() ? topic.getEventType().toString() : null;
         this.unique_vehicle_id = topic.hasUniqueVehicleId() ? topic.getUniqueVehicleId() : null;
@@ -128,6 +124,21 @@ public abstract class Event {
         this.occu = payload.hasOccu() ? payload.getOccu() : null;
         this.seq = payload.hasSeq() ? payload.getSeq() : null;
         this.dr_type = payload.hasDrType() ? payload.getDrType() : null;
+    }
+
+    private Optional<Timestamp> safeParse(String time) {
+        if (time == null) {
+            return Optional.empty();
+        } else {
+            try {
+                OffsetDateTime offsetDt = OffsetDateTime.parse(time);
+                return Optional.of(Timestamp.valueOf(offsetDt.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime()));
+            } catch (Exception var2) {
+                log.error("Failed to convert {} to java.sql.Timestamp", time);
+                return Optional.empty();
+            }
+
+        }
     }
 
     static <T> Optional<T> wrapToOptional(Supplier<Boolean> isPresent, Supplier<T> getter) {
