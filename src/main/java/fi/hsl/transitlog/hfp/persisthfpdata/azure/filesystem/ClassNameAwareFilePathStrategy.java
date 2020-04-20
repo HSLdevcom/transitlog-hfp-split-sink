@@ -13,7 +13,7 @@ import java.util.regex.*;
 public
 class ClassNameAwareFilePathStrategy {
     String createFilename(Event event) {
-        return "/csv/" + event.getClass().getSimpleName() + "/" + DateFormat.todayInDateFormat() + ".csv";
+        return "csv/" + event.getClass().getSimpleName() + "/" + DateFormat.todayInDateFormat() + ".csv";
     }
 
     public Date parseDateFromFilePath(String filePath) throws ParseException {

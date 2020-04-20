@@ -21,7 +21,7 @@ class LazyBlobstorageTest extends AbstractPodamTest {
     @BeforeEach
     void setUp() throws IOException {
         //Create a test file if it doesn't exist already
-        file = new File("/csv/VehiclePosition/2010-01-02-hfp.csv");
+        file = new File("csv/VehiclePosition/2010-01-02-hfp.csv");
         file.getParentFile().mkdirs();
         file.createNewFile();
         blobClientWrapper = mock(AzureUploader.AzureBlobClient.class);

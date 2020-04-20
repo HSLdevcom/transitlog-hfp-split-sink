@@ -30,7 +30,7 @@ class FaultAwareAzureUploader extends AzureUploader implements Runnable {
     @Override
     public void run() {
         try {
-            Stream<Path> walk = Files.walk(Paths.get("/csv"));
+            Stream<Path> walk = Files.walk(Paths.get("csv"));
             walk.map(Path::toString)
                     .filter(this::isPreviousDate)
                     .forEach(this::uploadBlob);
