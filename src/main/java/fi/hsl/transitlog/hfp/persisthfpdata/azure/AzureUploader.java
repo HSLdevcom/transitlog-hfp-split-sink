@@ -51,7 +51,7 @@ class AzureUploader {
         }
     }
 
-    private class AzureUploadTask implements Runnable {
+    private static class AzureUploadTask implements Runnable {
         private final AzureBlobClient blobClient;
         private final String filePath;
 
