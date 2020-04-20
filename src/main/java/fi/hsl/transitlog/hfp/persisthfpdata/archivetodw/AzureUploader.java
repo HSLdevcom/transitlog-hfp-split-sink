@@ -1,13 +1,14 @@
-package fi.hsl.transitlog.hfp.persisthfpdata.azure;
+package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
 
 
 import com.azure.storage.blob.*;
+import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
-import java.io.*;
 import java.util.concurrent.*;
 
+@Component
 class AzureUploader {
     private final ExecutorService executorService;
     private final AzureBlobClient azureBlobClient;
@@ -17,9 +18,9 @@ class AzureUploader {
         executorService = Executors.newCachedThreadPool();
     }
 
-    void uploadBlob(String filePath) {
+    AzureUploadTask uploadBlob(String filePath) {
         //Register as task for the asynchronous uploader
-        executorService.submit(new AzureUploadTask(azureBlobClient, filePath));
+        return new AzureUploadTask(azureBlobClient, filePath).run();
     }
 
     @Component
@@ -51,7 +52,8 @@ class AzureUploader {
         }
     }
 
-    private static class AzureUploadTask implements Runnable {
+    @Slf4j
+    static class AzureUploadTask {
         private final AzureBlobClient blobClient;
         private final String filePath;
 
@@ -60,14 +62,14 @@ class AzureUploader {
             this.filePath = filePath;
         }
 
-        @Override
-        public void run() {
+        public AzureUploadTask run() {
+            log.info("Uploading dump from filepath: {}", filePath);
             this.blobClient.uploadFromFile(filePath);
-            //Check file exists and then remove it from filesystem
-            if (this.blobClient.fileExists(filePath)) {
-                File file = new File(filePath);
-                file.delete();
-            }
+            return this;
+        }
+
+        boolean isUploaded() {
+            return this.blobClient.fileExists(filePath);
         }
     }
 }

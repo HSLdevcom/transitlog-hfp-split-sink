@@ -1,12 +1,10 @@
-package fi.hsl.transitlog.hfp.persisthfpdata.azure.filesystem;
+package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.filesystem;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.csv.*;
 import fi.hsl.transitlog.hfp.domain.*;
-import org.springframework.stereotype.*;
 
-@Component
 public class CSVMapper {
     public String format(Event event) throws JsonProcessingException {
         CsvMapper schemaMapper = new CsvMapper();

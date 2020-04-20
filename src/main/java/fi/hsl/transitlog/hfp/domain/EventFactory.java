@@ -1,7 +1,9 @@
 package fi.hsl.transitlog.hfp.domain;
 
 import fi.hsl.common.hfp.proto.*;
+import org.springframework.stereotype.*;
 
+@Component
 public class EventFactory {
     public Event createVehiclePositionEvent(Hfp.Topic topic, Hfp.Payload payload) {
         return new VehiclePosition(topic, payload);

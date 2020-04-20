@@ -3,7 +3,7 @@ package fi.hsl.transitlog.hfp.persisthfpdata;
 import fi.hsl.common.hfp.proto.*;
 import fi.hsl.common.pulsar.*;
 import fi.hsl.transitlog.hfp.domain.*;
-import fi.hsl.transitlog.hfp.persisthfpdata.azure.*;
+import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.*;
 import lombok.extern.slf4j.*;
 import org.apache.pulsar.client.api.*;
 import org.springframework.beans.factory.annotation.*;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.*;
 
 import javax.persistence.*;
 import java.io.*;
+import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.*;
 public class DomainMappingWriter {
     final Map<MessageId, Event> eventQueue;
     private final DumpService dumpTask;
-    private final BlobStorageInterface blobStorageInterface;
+    private final DWUpload DWUpload;
     private final EventFactory eventFactory;
     ScheduledExecutorService scheduler;
     private EntityManager entityManager;
@@ -29,8 +30,8 @@ public class DomainMappingWriter {
 
 
     @Autowired
-    DomainMappingWriter(BlobStorageInterface blobStorageInterface, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
-        this.blobStorageInterface = blobStorageInterface;
+    DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
+        this.DWUpload = dwUpload;
         eventQueue = new ConcurrentHashMap<>();
         this.dumpTask = dumpTask;
         this.entityManager = entityManager;
@@ -39,7 +40,7 @@ public class DomainMappingWriter {
         this.eventFactory = eventFactory;
     }
 
-    void process(MessageId msgId, Hfp.Data data) throws IOException {
+    void process(MessageId msgId, Hfp.Data data) throws IOException, ParseException {
         Event event = null;
         switch (data.getTopic().getEventType()) {
             case VP:
@@ -85,7 +86,7 @@ public class DomainMappingWriter {
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
-        blobStorageInterface.uploadBlob(event);
+        DWUpload.uploadBlob(event);
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
