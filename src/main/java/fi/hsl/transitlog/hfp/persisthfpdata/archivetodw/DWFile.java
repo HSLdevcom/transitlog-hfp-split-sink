@@ -24,6 +24,7 @@ public class DWFile {
     final long fileCreatedAt;
     final DWFileName dwFilename;
     private final File file;
+    private boolean isUploading = false;
 
     public DWFile(Event event, String rootFolder) throws IOException, ParseException {
         this(new DWFileName().createFileName(rootFolder, event));
@@ -60,6 +61,7 @@ public class DWFile {
         if (diff > fileTimeDelays.fileLastModifiedInSecondsBuffer) {
             //Upload file
             azureUploader.uploadBlob(filePath);
+            isUploading = true;
             scheduleForRemoval(filePath, fileTimeDelays.scheduledExecutorService, fileTimeDelays.delayBeforeFileDeletion);
             return true;
         }
@@ -81,6 +83,10 @@ public class DWFile {
                 e.printStackTrace();
             }
         }, delayBeforeRemoval, TimeUnit.SECONDS);
+    }
+
+    boolean isUploading() {
+        return isUploading;
     }
 
     static

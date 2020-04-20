@@ -49,10 +49,11 @@ public class LazyDWService implements DWUpload {
         dwFileSet = fileStream.readDWFiles(filePath);
     }
 
-    @Scheduled(fixedDelay = 50000)
+    @Scheduled(fixedDelay = 50000, initialDelay = 3000)
     public void uploadOldEnough() {
         log.info("Attempting to upload old enough blobs");
         List<DWFile> oldEnoughBlobs = dwFileSet.stream()
+                .filter(dwFile -> !dwFile.isUploading())
                 .filter(dwFile -> {
                     try {
                         DWFile.FileTimeDelays fileTimeDelays = new DWFile.FileTimeDelays(fileLastModifiedInSecondsBuffer, delayBeforeFileDeletion, scheduledExecutorService);
