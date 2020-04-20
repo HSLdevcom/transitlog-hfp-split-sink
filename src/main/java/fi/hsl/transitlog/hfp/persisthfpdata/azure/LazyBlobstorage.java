@@ -16,12 +16,12 @@ import java.io.*;
 public class LazyBlobstorage implements BlobStorageInterface {
 
     private final FileStream fileStream;
-    private final FaultAwareAzureUploader faultAwareAzureUploader;
+    private final AzureUploader faultAwareAzureUploader;
 
     @Autowired
-    LazyBlobstorage(FileStream fileStream, FaultAwareAzureUploader faultAwareAzureUploader) {
+    LazyBlobstorage(FileStream fileStream, @Qualifier("faultAwareAzureUploader") AzureUploader azureUploader) {
         this.fileStream = fileStream;
-        this.faultAwareAzureUploader = faultAwareAzureUploader;
+        this.faultAwareAzureUploader = azureUploader;
     }
 
     @Override
