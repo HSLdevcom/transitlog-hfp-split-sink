@@ -1,13 +1,11 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
-import fi.hsl.common.hfp.proto.Hfp;
-import fi.hsl.common.pulsar.IMessageHandler;
-import fi.hsl.transitlog.hfp.HfpDataParser;
-import fi.hsl.transitlog.hfp.TransitDataSchemaWrapper;
-import org.apache.pulsar.client.api.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import fi.hsl.common.hfp.proto.*;
+import fi.hsl.common.pulsar.*;
+import fi.hsl.transitlog.hfp.*;
+import org.apache.pulsar.client.api.*;
+import org.slf4j.*;
+import org.springframework.stereotype.*;
 
 @Component
 public class MessageProcessor implements IMessageHandler {

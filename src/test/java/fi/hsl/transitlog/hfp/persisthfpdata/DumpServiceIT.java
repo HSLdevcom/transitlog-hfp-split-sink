@@ -1,20 +1,17 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
-import config.H2Configuration;
-import config.PulsarConfiguration;
-import fi.hsl.Main;
-import fi.hsl.transitlog.hfp.domain.Event;
-import fi.hsl.transitlog.hfp.domain.repositories.EventRepository;
-import org.junit.Ignore;
+import config.*;
+import fi.hsl.*;
+import fi.hsl.transitlog.hfp.domain.*;
+import fi.hsl.transitlog.hfp.domain.repositories.*;
+import org.junit.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.junit.jupiter.api.extension.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.test.context.*;
+import org.springframework.test.context.junit.jupiter.*;
 
-import java.util.List;
+import java.util.*;
 
 @ActiveProfiles(value = "integration-test")
 @TestPropertySource(value = "classpath:/application.properties")
