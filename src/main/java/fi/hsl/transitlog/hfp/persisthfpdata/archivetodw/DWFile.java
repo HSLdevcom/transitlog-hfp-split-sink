@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
 
-@EqualsAndHashCode
 @Slf4j
 public class DWFile {
 
@@ -87,6 +86,19 @@ public class DWFile {
 
     boolean isUploading() {
         return isUploading;
+    }
+
+    @Override
+    public int hashCode() {
+        return filePath.hashCode() * 31;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DWFile) {
+            return ((DWFile) obj).filePath.equals(filePath);
+        }
+        return false;
     }
 
     static
