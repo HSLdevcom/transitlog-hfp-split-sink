@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 @Component
 class AzureUploader {
     private final ExecutorService executorService;
-    private final AzureBlobClient azureBlobClient;
+    final AzureBlobClient azureBlobClient;
 
     AzureUploader(AzureBlobClient azureBlobClient) {
         this.azureBlobClient = azureBlobClient;
@@ -26,7 +26,7 @@ class AzureUploader {
     @Component
     static
     class AzureBlobClient {
-        private BlobContainerClient blobContainerClient;
+        BlobContainerClient blobContainerClient;
 
         AzureBlobClient(@Value(value = "${blobstorage.connectionString}") String connectionString, @Value(value = "${blobstorage.blobcontainer}") String blobContainer) {
             BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()

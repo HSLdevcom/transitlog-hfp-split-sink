@@ -26,13 +26,14 @@ public class LazyDWService implements DWUpload {
     private final AzureUploader azureUploader;
     private final ScheduledExecutorService scheduledExecutorService;
     private final Integer delayBeforeFileDeletion;
+    private final PrivateAzureUploader privateAzureUploader;
     private Set<DWFile> dwFileSet;
     private long fileLastModifiedInSecondsBuffer;
     private String filePath;
 
 
     @Autowired
-    LazyDWService(AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:5}")
+    LazyDWService(PrivateAzureUploader privateAzureUploader, AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:5}")
             Integer fileLastModifiedInSecondsBuffer, @Value("${filepath:csv}")
                           String filePath, @Value("${delayBeforeFileDeletion:1800}") Integer delayBeforeFileDeletion) throws ParseException {
         this.fileLastModifiedInSecondsBuffer = fileLastModifiedInSecondsBuffer;
@@ -40,6 +41,7 @@ public class LazyDWService implements DWUpload {
         this.filePath = filePath;
         this.fileStream = new FileStream(new CSVMapper(), filePath);
         this.azureUploader = azureUploader;
+        this.privateAzureUploader = privateAzureUploader;
         this.dwFileSet = ConcurrentHashMap.newKeySet();
         this.scheduledExecutorService = Executors.newScheduledThreadPool(2);
         populateFileSetFromFileSystem();
@@ -56,8 +58,13 @@ public class LazyDWService implements DWUpload {
                 .filter(dwFile -> !dwFile.isUploading())
                 .filter(dwFile -> {
                     try {
-                        DWFile.FileTimeDelays fileTimeDelays = new DWFile.FileTimeDelays(fileLastModifiedInSecondsBuffer, delayBeforeFileDeletion, scheduledExecutorService);
-                        return dwFile.archiveOldEnough(azureUploader, fileTimeDelays);
+                        if (dwFile instanceof PrivateDWFile) {
+                            DWFile.FileTimeDelays fileTimeDelays = new DWFile.FileTimeDelays(fileLastModifiedInSecondsBuffer, delayBeforeFileDeletion, scheduledExecutorService);
+                            return dwFile.archiveOldEnough(privateAzureUploader, fileTimeDelays);
+                        } else {
+                            DWFile.FileTimeDelays fileTimeDelays = new DWFile.FileTimeDelays(fileLastModifiedInSecondsBuffer, delayBeforeFileDeletion, scheduledExecutorService);
+                            return dwFile.archiveOldEnough(azureUploader, fileTimeDelays);
+                        }
                     } catch (IOException e) {
                         log.error("Error thrown", e);
                     }

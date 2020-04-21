@@ -30,13 +30,22 @@ class FileStream {
         Iterator<File> fileIterator = FileUtils.iterateFiles(new File(filePath), null, true);
         while (fileIterator.hasNext()) {
             File dwFile = fileIterator.next();
-            dwFiles.add(new DWFile(dwFile));
+            if (dwFile.getPath().contains("private")) {
+                dwFiles.add(new PrivateDWFile(dwFile));
+            } else {
+                dwFiles.add(new DWFile(dwFile));
+            }
         }
         return dwFiles;
     }
 
     public DWFile writeEvent(Event event) throws IOException, ParseException {
-        DWFile dwFile = new DWFile(event, csvFolder);
+        DWFile dwFile;
+        if (event.getJourney_type().equals("journey")) {
+            dwFile = new DWFile(event, csvFolder);
+        } else {
+            dwFile = new PrivateDWFile(event, csvFolder + "/private");
+        }
 
         String filePath = dwFile.getFilePath();
         if (dwFiles.containsKey(filePath)) {
