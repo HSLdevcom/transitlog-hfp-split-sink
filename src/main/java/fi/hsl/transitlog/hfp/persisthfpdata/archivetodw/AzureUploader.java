@@ -13,7 +13,8 @@ class AzureUploader {
     private final ExecutorService executorService;
     final AzureBlobClient azureBlobClient;
 
-    AzureUploader(AzureBlobClient azureBlobClient) {
+    @Autowired
+    AzureUploader(@Qualifier("azureBlobClient") AzureBlobClient azureBlobClient) {
         this.azureBlobClient = azureBlobClient;
         executorService = Executors.newCachedThreadPool();
     }
