@@ -2,6 +2,7 @@ package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
 
 import fi.hsl.transitlog.hfp.domain.*;
 import fi.hsl.transitlog.hfp.persisthfpdata.*;
+import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure.*;
 import org.apache.commons.io.*;
 import org.junit.jupiter.api.*;
 
@@ -18,7 +19,7 @@ import static org.springframework.test.util.AssertionErrors.*;
 
 class LazyDWServiceTest extends AbstractPodamTest {
     private LazyDWService lazyBlobStorage;
-    private AzureUploader.AzureBlobClient blobClientWrapper;
+    private AzureBlobClient blobClientWrapper;
     private File file;
 
     @BeforeEach
@@ -29,7 +30,7 @@ class LazyDWServiceTest extends AbstractPodamTest {
         file = new File(fileFolder + "/VehiclePosition/2010-01-02-02-hfp.csv");
         file.getParentFile().mkdirs();
         file.createNewFile();
-        blobClientWrapper = mock(AzureUploader.AzureBlobClient.class);
+        blobClientWrapper = mock(AzureBlobClient.class);
         this.lazyBlobStorage = new LazyDWService(new PrivateAzureUploader(blobClientWrapper), new AzureUploader(blobClientWrapper), 1, fileFolder, 3);
 
 

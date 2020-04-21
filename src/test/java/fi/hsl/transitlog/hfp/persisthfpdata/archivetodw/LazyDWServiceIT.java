@@ -22,7 +22,7 @@ public class LazyDWServiceIT extends AbstractPodamTest {
         OtherEvent otherEvent = podamFactory.manufacturePojo(OtherEvent.class);
         lazyDWService.uploadBlob(otherEvent);
         lazyDWService.uploadBlob(otherEvent);
-        Thread.sleep(10000000L);
+        Thread.sleep(1000);
     }
 
     @AfterEach

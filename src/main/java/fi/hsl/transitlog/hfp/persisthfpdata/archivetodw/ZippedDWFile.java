@@ -1,5 +1,7 @@
 package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
 
+import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure.*;
+
 import java.io.*;
 import java.nio.file.*;
 import java.text.*;
@@ -25,7 +27,7 @@ class ZippedDWFile extends DWFile {
         long diff = currentTime - fileCreatedAt;
         if (diff / 1000 > lastModifiedBufferInSeconds) {
             //Upload file
-            AzureUploader.AzureUploadTask azureUploadTask = azureUploader.uploadBlob(zipFileName);
+            AzureUploadTask azureUploadTask = azureUploader.uploadBlob(zipFileName);
             if (azureUploadTask.isUploaded()) {
                 scheduleForRemoval(zipFileName, executorService, delayBeforeRemovalSeconds);
                 scheduleForRemoval(filePath, executorService, delayBeforeRemovalSeconds);

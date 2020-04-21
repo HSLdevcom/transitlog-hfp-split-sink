@@ -1,6 +1,7 @@
 package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
 
 import fi.hsl.transitlog.hfp.domain.*;
+import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure.*;
 import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.filesystem.*;
 import lombok.*;
 import lombok.experimental.Delegate;

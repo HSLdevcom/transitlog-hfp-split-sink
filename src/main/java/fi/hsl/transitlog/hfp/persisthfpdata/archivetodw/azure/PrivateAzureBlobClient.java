@@ -1,18 +1,11 @@
-package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
+package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure;
 
 import com.azure.storage.blob.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
 @Component
-public class PrivateAzureUploader extends AzureUploader {
-    PrivateAzureUploader(@Qualifier("privateAzureBlobClient") AzureBlobClient azureBlobClient) {
-        super(azureBlobClient);
-    }
-}
-
-@Component
-class PrivateAzureBlobClient extends AzureUploader.AzureBlobClient {
+class PrivateAzureBlobClient extends AzureBlobClient {
     PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString, @Value("${blobstorage.privateblobcontainer}") String blobContainer) {
         super(connectionString, blobContainer);
     }
@@ -22,10 +15,8 @@ class PrivateAzureBlobClient extends AzureUploader.AzureBlobClient {
         blobClient.uploadFromFile(filePath, true);
     }
 
-    boolean fileExists(String filePath) {
+    public boolean fileExists(String filePath) {
         blobContainerClient.getBlobClient(filePath);
         return blobContainerClient.exists();
     }
 }
-
-
