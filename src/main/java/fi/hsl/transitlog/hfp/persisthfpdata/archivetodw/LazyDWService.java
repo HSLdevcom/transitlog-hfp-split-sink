@@ -35,7 +35,7 @@ public class LazyDWService implements DWUpload {
 
 
     @Autowired
-    LazyDWService(AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:300}")
+    LazyDWService(AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:1800}")
             Integer fileLastModifiedInSecondsBuffer, @Value("${filepath:csv}")
                           String filePath, @Value("${delayBeforeFileDeletionSeconds:1800}") Integer delayBeforeFileDeletionSeconds) throws ParseException {
         this.fileLastModifiedInSecondsBuffer = fileLastModifiedInSecondsBuffer;
