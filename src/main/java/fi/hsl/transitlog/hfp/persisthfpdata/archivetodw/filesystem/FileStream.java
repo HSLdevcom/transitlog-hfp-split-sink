@@ -51,7 +51,7 @@ class FileStream {
         if (dwFiles.containsKey(filePath)) {
             dwFile = dwFiles.get(filePath);
         } else {
-            dwFile = new DWFile(filePath);
+            dwFiles.put(filePath, dwFile);
         }
         dwFile.writeEvent(event, csvMapper);
         return dwFile;
