@@ -1,12 +1,10 @@
 package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw;
 
 import fi.hsl.transitlog.hfp.domain.*;
-import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure.*;
 import fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.filesystem.*;
 import lombok.*;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.*;
-import org.apache.commons.io.*;
 
 import java.io.*;
 import java.text.*;
@@ -24,7 +22,6 @@ public class DWFile {
     final long fileCreatedAt;
     final DWFileName dwFilename;
     private final File file;
-    private boolean isUploading = false;
 
     public DWFile(Event event, String rootFolder) throws IOException, ParseException {
         this(new DWFileName().createFileName(rootFolder, event));
@@ -55,39 +52,16 @@ public class DWFile {
         fileWriter.close();
     }
 
-    boolean archiveOldEnough(AzureUploader azureUploader, FileTimeDelays fileTimeDelays) throws IOException {
+    boolean fileSuitableForUpload(long fileLastModifiedInSecondsBuffer) {
         long currentTime = dwFilename.fileTimeStampNow();
         final long diff = (currentTime - fileLastModified()) / 1000;
-        if (diff > fileTimeDelays.fileLastModifiedInSecondsBuffer) {
-            //Upload file
-            azureUploader.uploadBlob(filePath);
-            isUploading = true;
-            scheduleForRemoval(filePath, fileTimeDelays.scheduledExecutorService, fileTimeDelays.delayBeforeFileDeletion);
-            return true;
-        }
-        return false;
+        return diff > fileLastModifiedInSecondsBuffer;
     }
 
     private long fileLastModified() {
         return file.lastModified();
     }
 
-    void scheduleForRemoval(String filePath, ScheduledExecutorService executorService, long delayBeforeRemoval) {
-        executorService.schedule(() -> {
-            File file = new File(filePath);
-            try {
-                FileUtils.forceDelete(file);
-                log.info("Removed file: {}", file.getPath());
-            } catch (IOException e) {
-                log.info("Failed to remove file: {}", file.getPath());
-                e.printStackTrace();
-            }
-        }, delayBeforeRemoval, TimeUnit.SECONDS);
-    }
-
-    boolean isUploading() {
-        return isUploading;
-    }
 
     @Override
     public int hashCode() {
@@ -119,7 +93,8 @@ public class DWFile {
     @NoArgsConstructor
     static
     class DWFileName {
-        private static final String DW_FILE_DATEFORMAT = "yyyy-MM-dd-hh";
+        //Hours 0-23
+        private static final String DW_FILE_DATEFORMAT = "yyyy-MM-dd-HH";
         private static final String TIMEZONE = "Europe/Helsinki";
         @Delegate
         private Date dwFileNameWithDateComponent;

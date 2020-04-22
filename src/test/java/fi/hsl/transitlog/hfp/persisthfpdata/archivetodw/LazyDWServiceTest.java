@@ -21,6 +21,7 @@ class LazyDWServiceTest extends AbstractPodamTest {
     private LazyDWService lazyBlobStorage;
     private AzureBlobClient blobClientWrapper;
     private File file;
+    private PrivateAzureBlobClient privateBlobClient;
 
     @BeforeEach
     void setUp() throws IOException, ParseException {
@@ -31,9 +32,11 @@ class LazyDWServiceTest extends AbstractPodamTest {
         file.getParentFile().mkdirs();
         file.createNewFile();
         blobClientWrapper = mock(AzureBlobClient.class);
-        this.lazyBlobStorage = new LazyDWService(new PrivateAzureUploader(blobClientWrapper), new AzureUploader(blobClientWrapper), 1, fileFolder, 3);
+        privateBlobClient = mock(PrivateAzureBlobClient.class);
+        this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder, 3);
 
 
+        when(privateBlobClient.fileExists(any())).thenReturn(true);
         when(blobClientWrapper.fileExists(any())).thenReturn(true);
     }
 
