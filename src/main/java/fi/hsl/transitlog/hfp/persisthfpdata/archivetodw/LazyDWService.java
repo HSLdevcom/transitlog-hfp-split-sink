@@ -69,8 +69,11 @@ public class LazyDWService implements DWUpload {
 
     private DWFile uploadFile(DWFile dwFile) {
         //Upload file
-        azureUploader.uploadBlob(dwFile.getFilePath());
-        scheduleForRemoval(dwFile.getFilePath());
+        if (new File(dwFile.getFilePath()).exists()) {
+            azureUploader.uploadBlob(dwFile.getFilePath());
+            scheduleForRemoval(dwFile.getFilePath());
+            return dwFile;
+        }
         return dwFile;
     }
 
