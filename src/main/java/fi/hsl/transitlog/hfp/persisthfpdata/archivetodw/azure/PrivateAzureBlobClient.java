@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
 @Component
-class PrivateAzureBlobClient extends AzureBlobClient {
+public class PrivateAzureBlobClient extends AzureBlobClient {
     PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString, @Value("${blobstorage.privateblobcontainer}") String blobContainer) {
         super(connectionString, blobContainer);
     }
