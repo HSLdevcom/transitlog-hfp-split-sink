@@ -11,7 +11,6 @@ import java.text.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.regex.*;
 
 @Slf4j
@@ -76,25 +75,11 @@ public class DWFile {
         return false;
     }
 
-    static
-    class FileTimeDelays {
-
-        final long fileLastModifiedInSecondsBuffer;
-        final Integer delayBeforeFileDeletion;
-        final ScheduledExecutorService scheduledExecutorService;
-
-        FileTimeDelays(long fileLastModifiedInSecondsBuffer, Integer delayBeforeFileDeletion, ScheduledExecutorService scheduledExecutorService) {
-            this.fileLastModifiedInSecondsBuffer = fileLastModifiedInSecondsBuffer;
-            this.delayBeforeFileDeletion = delayBeforeFileDeletion;
-            this.scheduledExecutorService = scheduledExecutorService;
-        }
-    }
-
     @NoArgsConstructor
     static
     class DWFileName {
         //Hours 0-23
-        private static final String DW_FILE_DATEFORMAT = "yyyy-MM-dd-HH";
+        private static final String DW_FILE_DATEFORMAT = "yyyy-MM-dd";
         private static final String TIMEZONE = "Europe/Helsinki";
         @Delegate
         private Date dwFileNameWithDateComponent;
@@ -109,8 +94,8 @@ public class DWFile {
 
         private static String eventDateInDWFormat(Event event) {
             LocalDateTime tstLocalizedDateTime = event.getTst().toInstant().atZone(ZoneId.of(DWFileName.TIMEZONE)).toLocalDateTime();
-            DateTimeFormatter year_month_day_hour_format = DateTimeFormatter.ofPattern(DWFileName.DW_FILE_DATEFORMAT, Locale.ENGLISH);
-            return year_month_day_hour_format.format(tstLocalizedDateTime);
+            DateTimeFormatter year_month_day_format = DateTimeFormatter.ofPattern(DWFileName.DW_FILE_DATEFORMAT, Locale.ENGLISH);
+            return year_month_day_format.format(tstLocalizedDateTime);
         }
 
         @Data
@@ -123,7 +108,7 @@ public class DWFile {
 
             private long parseFileCreatedAt(File file) throws ParseException {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DWFileName.DW_FILE_DATEFORMAT);
-                Pattern compile = Pattern.compile("\\d{4}-\\d{2}-\\d{2}-\\d{2}");
+                Pattern compile = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
                 Matcher matcher = compile.matcher(file.getPath());
                 if (!matcher.find()) {
                     throw new ParseException("found no dates in filename", 0);
