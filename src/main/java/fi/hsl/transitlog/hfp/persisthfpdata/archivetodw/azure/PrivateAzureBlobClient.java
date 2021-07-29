@@ -6,17 +6,7 @@ import org.springframework.stereotype.*;
 
 @Component
 public class PrivateAzureBlobClient extends AzureBlobClient {
-    PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString, @Value("${blobstorage.privateblobcontainer}") String blobContainer) {
-        super(connectionString, blobContainer);
-    }
-
-    void uploadFromFile(String filePath) {
-        BlobClient blobClient = blobContainerClient.getBlobClient(filePath);
-        blobClient.uploadFromFile(filePath, true);
-    }
-
-    public boolean fileExists(String filePath) {
-        blobContainerClient.getBlobClient(filePath);
-        return blobContainerClient.exists();
+    PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString, @Value("${blobstorage.privateblobcontainer}") String blobContainer, @Value("${csv.compress:false}") boolean compress) {
+        super(connectionString, blobContainer, compress);
     }
 }
