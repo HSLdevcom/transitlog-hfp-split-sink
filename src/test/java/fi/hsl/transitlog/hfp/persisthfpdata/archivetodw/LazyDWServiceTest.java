@@ -33,7 +33,7 @@ class LazyDWServiceTest extends AbstractPodamTest {
         file.createNewFile();
         blobClientWrapper = mock(AzureBlobClient.class);
         privateBlobClient = mock(PrivateAzureBlobClient.class);
-        this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder, 3);
+        this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder, 3, true);
 
 
         when(privateBlobClient.fileExists(any())).thenReturn(true);

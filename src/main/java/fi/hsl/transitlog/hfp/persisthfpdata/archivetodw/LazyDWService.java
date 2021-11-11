@@ -33,11 +33,12 @@ public class LazyDWService implements DWUpload {
     private long fileLastModifiedInSecondsBuffer;
     private String filePath;
 
+    private boolean enabled;
 
     @Autowired
     LazyDWService(AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:1800}")
             Integer fileLastModifiedInSecondsBuffer, @Value("${filepath:csv}")
-                          String filePath, @Value("${delayBeforeFileDeletionSeconds:1800}") Integer delayBeforeFileDeletionSeconds) throws ParseException {
+                          String filePath, @Value("${delayBeforeFileDeletionSeconds:1800}") Integer delayBeforeFileDeletionSeconds, @Value("{csvUploadEnabled:true}") Boolean enabled) throws ParseException {
         this.fileLastModifiedInSecondsBuffer = fileLastModifiedInSecondsBuffer;
         this.delayBeforeFileDeletion = delayBeforeFileDeletionSeconds;
         this.filePath = filePath;
@@ -47,6 +48,8 @@ public class LazyDWService implements DWUpload {
         this.scheduledExecutorService = Executors.newScheduledThreadPool(2);
         this.removalExecutorService = Executors.newScheduledThreadPool(2);
         populateFileSetFromFileSystem();
+
+        this.enabled = enabled;
     }
 
     private void populateFileSetFromFileSystem() throws ParseException {
@@ -92,8 +95,12 @@ public class LazyDWService implements DWUpload {
 
     @Override
     public String uploadBlob(Event event) throws IOException, ParseException {
-        DWFile dwFile = this.fileStream.writeEvent(event);
-        dwFileSet.add(dwFile);
-        return dwFile.getFilePath();
+        if (enabled) {
+            DWFile dwFile = this.fileStream.writeEvent(event);
+            dwFileSet.add(dwFile);
+            return dwFile.getFilePath();
+        } else {
+            return null;
+        }
     }
 }
