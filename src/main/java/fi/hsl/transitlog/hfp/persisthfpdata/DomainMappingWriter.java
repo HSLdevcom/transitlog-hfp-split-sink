@@ -13,12 +13,17 @@ import org.springframework.stereotype.*;
 import javax.persistence.*;
 import java.io.*;
 import java.text.*;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.BooleanSupplier;
 
 @Slf4j
 @Component
 public class DomainMappingWriter {
+    //TODO: this should be configurable
+    private final long UNHEALTHY_AFTER_NO_UPLOAD_MS = 60 * 10 * 1000;
+
     final Map<MessageId, Event> eventQueue;
     private final DumpService dumpTask;
     private final DWUpload DWUpload;
@@ -28,6 +33,9 @@ public class DomainMappingWriter {
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
 
+    private long lastUpload = System.nanoTime();
+    //Health check that checks that data was written to the DB in last 10 minutes
+    private final BooleanSupplier isHealthy = () -> Duration.ofNanos(System.nanoTime() - lastUpload).compareTo(Duration.ofMillis(UNHEALTHY_AFTER_NO_UPLOAD_MS)) > 0;
 
     @Autowired
     DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
@@ -38,6 +46,11 @@ public class DomainMappingWriter {
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
         this.eventFactory = eventFactory;
+
+        //Add health check if health checks are enabled (i.e. health server is not null)
+        if (pulsarApplication.getContext().getHealthServer() != null) {
+            pulsarApplication.getContext().getHealthServer().addCheck(isHealthy);
+        }
     }
 
     void process(MessageId msgId, Hfp.Data data) throws IOException, ParseException {
