@@ -114,7 +114,7 @@ public class DomainMappingWriter {
         }
     }
 
-    private void ack(MessageId received) {
+    public void ack(MessageId received) {
         consumer.acknowledgeAsync(received)
                 .exceptionally(throwable -> {
                     log.error("Failed to ack Pulsar message", throwable);
