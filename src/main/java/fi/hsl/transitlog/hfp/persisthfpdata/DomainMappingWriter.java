@@ -23,7 +23,6 @@ public class DomainMappingWriter {
     private final DumpService dumpTask;
     private final DWUpload DWUpload;
     private final EventFactory eventFactory;
-    ScheduledExecutorService scheduler;
     private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
@@ -109,10 +108,8 @@ public class DomainMappingWriter {
 
     void close(boolean closePulsar) {
         log.warn("Closing MessageProcessor resources");
-        scheduler.shutdown();
-        log.info("Scheduler shutdown finished");
         if (closePulsar && pulsarApplication != null) {
-            log.info("Closing also Pulsar application");
+            log.info("Closing Pulsar application");
             pulsarApplication.close();
         }
     }
