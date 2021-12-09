@@ -85,7 +85,9 @@ public class DomainMappingWriter {
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
-        DWUpload.uploadBlob(event);
+        if (event != null) {
+            DWUpload.uploadBlob(event);
+        }
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
