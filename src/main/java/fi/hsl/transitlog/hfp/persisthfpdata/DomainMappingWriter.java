@@ -23,7 +23,6 @@ public class DomainMappingWriter {
     private final DumpService dumpTask;
     private final DWUpload DWUpload;
     private final EventFactory eventFactory;
-    ScheduledExecutorService scheduler;
     private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
@@ -86,7 +85,9 @@ public class DomainMappingWriter {
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
-        DWUpload.uploadBlob(event);
+        if (event != null) {
+            DWUpload.uploadBlob(event);
+        }
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
@@ -109,15 +110,13 @@ public class DomainMappingWriter {
 
     void close(boolean closePulsar) {
         log.warn("Closing MessageProcessor resources");
-        scheduler.shutdown();
-        log.info("Scheduler shutdown finished");
         if (closePulsar && pulsarApplication != null) {
-            log.info("Closing also Pulsar application");
+            log.info("Closing Pulsar application");
             pulsarApplication.close();
         }
     }
 
-    private void ack(MessageId received) {
+    public void ack(MessageId received) {
         consumer.acknowledgeAsync(received)
                 .exceptionally(throwable -> {
                     log.error("Failed to ack Pulsar message", throwable);
