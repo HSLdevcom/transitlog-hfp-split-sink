@@ -1,5 +1,6 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import fi.hsl.common.hfp.proto.*;
 import fi.hsl.common.pulsar.*;
 import fi.hsl.transitlog.hfp.*;
@@ -24,8 +25,14 @@ public class MessageProcessor implements IMessageHandler {
     @Override
     public void handleMessage(Message message) throws Exception {
         if (transitdataSchemaWrapper.hasProtobufSchema(message)) {
-            Hfp.Data data = hfpDataParser.parseFrom(message.getData());
-            domainMappingWriter.process(message.getMessageId(), data);
+            try {
+                Hfp.Data data = hfpDataParser.parseFrom(message.getData());
+                domainMappingWriter.process(message.getMessageId(), data);
+            } catch (InvalidProtocolBufferException ipbe) {
+                log.warn("Invalid protobuf, unable to handle message");
+                //Acknowledge invalid messages so that we don't receive them again
+                domainMappingWriter.ack(message.getMessageId());
+            }
         } else {
             log.warn("Invalid protobuf schema, expecting HfpData");
         }
