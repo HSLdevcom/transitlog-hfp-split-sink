@@ -24,6 +24,9 @@ public class DumpService {
         Map<MessageId, Event> eventQueueCopy;
         synchronized (eventQueue) {
             eventQueueCopy = eventQueue.entrySet().stream()
+                    //Filter events that don't have timestamp.
+                    //These can break partitioning in the database and events without timestamp cannot be shown in transitlog-ui anyway
+                    .filter(entry -> entry.getValue().getTst() != null)
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
             eventQueue.clear();
         }
