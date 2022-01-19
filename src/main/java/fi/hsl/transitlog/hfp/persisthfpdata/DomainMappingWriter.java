@@ -35,7 +35,14 @@ public class DomainMappingWriter {
 
     private long lastUpload = System.nanoTime();
     //Health check that checks that data was written to the DB in last 10 minutes
-    private final BooleanSupplier isHealthy = () -> Duration.ofNanos(System.nanoTime() - lastUpload).compareTo(Duration.ofMillis(UNHEALTHY_AFTER_NO_UPLOAD_MS)) > 0;
+    private final BooleanSupplier isHealthy = () -> {
+        final boolean healthy = Duration.ofNanos(System.nanoTime() - lastUpload).compareTo(Duration.ofMillis(UNHEALTHY_AFTER_NO_UPLOAD_MS)) > 0;
+        if (!healthy) {
+            log.warn("Service unhealthy, data last written to DB {} seconds ago", Duration.ofNanos(System.nanoTime() - lastUpload).toSeconds());
+        }
+
+        return healthy;
+    };
 
     @Autowired
     DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
