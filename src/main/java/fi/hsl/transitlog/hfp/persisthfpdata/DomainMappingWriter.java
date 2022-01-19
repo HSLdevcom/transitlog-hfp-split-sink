@@ -108,6 +108,8 @@ public class DomainMappingWriter {
         try {
             List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
             ackMessages(dumpedMessagedIds);
+
+            lastUpload = System.nanoTime();
         } catch (Exception e) {
             log.error("Failed to check results, closing application", e);
             close(true);
