@@ -22,7 +22,7 @@ import java.util.function.BooleanSupplier;
 @Component
 public class DomainMappingWriter {
     //TODO: this should be configurable
-    private final long UNHEALTHY_AFTER_NO_UPLOAD_MS = 60 * 10 * 1000;
+    private final Duration UNHEALTHY_AFTER_NO_UPLOAD = Duration.ofMinutes(10);
 
     final Map<MessageId, Event> eventQueue;
     private final DumpService dumpTask;
@@ -35,9 +35,11 @@ public class DomainMappingWriter {
     private long lastUpload = System.nanoTime();
     //Health check that checks that data was written to the DB in last 10 minutes
     private final BooleanSupplier isHealthy = () -> {
-        final boolean healthy = Duration.ofNanos(System.nanoTime() - lastUpload).compareTo(Duration.ofMillis(UNHEALTHY_AFTER_NO_UPLOAD_MS)) > 0;
+        final Duration lastUploadDelta = Duration.ofNanos(System.nanoTime() - lastUpload);
+
+        final boolean healthy = lastUploadDelta.compareTo(UNHEALTHY_AFTER_NO_UPLOAD) < 0;
         if (!healthy) {
-            log.warn("Service unhealthy, data last written to DB {} seconds ago", Duration.ofNanos(System.nanoTime() - lastUpload).toSeconds());
+            log.warn("Service unhealthy, data last written to DB {} seconds ago", lastUploadDelta.toSeconds());
         }
 
         return healthy;
