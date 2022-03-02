@@ -75,7 +75,9 @@ public class DomainMappingWriter {
                         eventQueue.put(msgId, event);
                         break;
                     default:
-                        log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
+                        if (data.getTopic().getJourneyType() != Hfp.Topic.JourneyType.signoff) {
+                            log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
+                        }
                 }
                 break;
             case DUE:
