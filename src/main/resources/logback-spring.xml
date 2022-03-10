@@ -16,7 +16,7 @@
         <logger name="fi.hsl" level="info" additivity="false">
             <appender-ref ref="stdout"/>
         </logger>
-        <root level="warn">
+        <root level="trace">
             <appender-ref ref="stdout"/>
         </root>
     </springProfile>
