@@ -112,6 +112,11 @@ public class DomainMappingWriter {
         if (event != null) {
             DWUpload.uploadBlob(event);
         }
+
+        //Acknowledge all messages that were not inserted to the event queue to avoid them filling up Pulsar backlogs
+        if (event == null) {
+            ack(msgId);
+        }
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
