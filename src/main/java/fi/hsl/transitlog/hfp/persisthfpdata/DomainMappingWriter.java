@@ -13,12 +13,17 @@ import org.springframework.stereotype.*;
 import javax.persistence.*;
 import java.io.*;
 import java.text.*;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.BooleanSupplier;
 
 @Slf4j
 @Component
 public class DomainMappingWriter {
+    //TODO: this should be configurable
+    private final Duration UNHEALTHY_AFTER_NO_UPLOAD = Duration.ofMinutes(10);
+
     final Map<MessageId, Event> eventQueue;
     private final DumpService dumpTask;
     private final DWUpload DWUpload;
@@ -27,6 +32,18 @@ public class DomainMappingWriter {
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
 
+    private long lastUpload = System.nanoTime();
+    //Health check that checks that data was written to the DB in last 10 minutes
+    private final BooleanSupplier isHealthy = () -> {
+        final Duration lastUploadDelta = Duration.ofNanos(System.nanoTime() - lastUpload);
+
+        final boolean healthy = lastUploadDelta.compareTo(UNHEALTHY_AFTER_NO_UPLOAD) < 0;
+        if (!healthy) {
+            log.warn("Service unhealthy, data last written to DB {} seconds ago", lastUploadDelta.toSeconds());
+        }
+
+        return healthy;
+    };
 
     @Autowired
     DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
@@ -37,6 +54,11 @@ public class DomainMappingWriter {
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
         this.eventFactory = eventFactory;
+
+        //Add health check if health checks are enabled (i.e. health server is not null)
+        if (pulsarApplication.getContext().getHealthServer() != null) {
+            pulsarApplication.getContext().getHealthServer().addCheck(isHealthy);
+        }
     }
 
     void process(MessageId msgId, Hfp.Data data) throws IOException, ParseException {
@@ -53,7 +75,9 @@ public class DomainMappingWriter {
                         eventQueue.put(msgId, event);
                         break;
                     default:
-                        log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
+                        if (data.getTopic().getJourneyType() != Hfp.Topic.JourneyType.signoff) {
+                            log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
+                        }
                 }
                 break;
             case DUE:
@@ -88,6 +112,11 @@ public class DomainMappingWriter {
         if (event != null) {
             DWUpload.uploadBlob(event);
         }
+
+        //Acknowledge all messages that were not inserted to the event queue to avoid them filling up Pulsar backlogs
+        if (event == null) {
+            ack(msgId);
+        }
     }
 
     @Scheduled(fixedRateString = "${application.dumpInterval}")
@@ -96,6 +125,8 @@ public class DomainMappingWriter {
         try {
             List<MessageId> dumpedMessagedIds = dumpTask.dump(eventQueue);
             ackMessages(dumpedMessagedIds);
+
+            lastUpload = System.nanoTime();
         } catch (Exception e) {
             log.error("Failed to check results, closing application", e);
             close(true);
