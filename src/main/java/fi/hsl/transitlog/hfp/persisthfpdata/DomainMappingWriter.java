@@ -32,6 +32,9 @@ public class DomainMappingWriter {
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
 
+    private final Duration hfpTstMaxPast;
+    private final Duration hfpTstMaxFuture;
+
     private long lastUpload = System.nanoTime();
     //Health check that checks that data was written to the DB in last 10 minutes
     private final BooleanSupplier isHealthy = () -> {
@@ -46,7 +49,13 @@ public class DomainMappingWriter {
     };
 
     @Autowired
-    DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager, DumpService dumpTask, EventFactory eventFactory) {
+    DomainMappingWriter(DWUpload dwUpload,
+                        PulsarApplication pulsarApplication,
+                        EntityManager entityManager,
+                        DumpService dumpTask,
+                        EventFactory eventFactory,
+                        @Value(value = "${hfp.tstMaxPast}") Integer hfpTstMaxPast,
+                        @Value(value = "${hfp.tstMaxFuture}") Integer hfpTstMaxFuture) {
         this.DWUpload = dwUpload;
         eventQueue = new ConcurrentHashMap<>();
         this.dumpTask = dumpTask;
@@ -54,6 +63,9 @@ public class DomainMappingWriter {
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
         this.eventFactory = eventFactory;
+
+        this.hfpTstMaxPast = Duration.ofDays(hfpTstMaxPast);
+        this.hfpTstMaxFuture = Duration.ofDays(hfpTstMaxFuture);
 
         //Add health check if health checks are enabled (i.e. health server is not null)
         if (pulsarApplication.getContext().getHealthServer() != null) {
@@ -68,11 +80,9 @@ public class DomainMappingWriter {
                 switch (data.getTopic().getJourneyType()) {
                     case journey:
                         event = eventFactory.createVehiclePositionEvent(data.getTopic(), data.getPayload());
-                        eventQueue.put(msgId, event);
                         break;
                     case deadrun:
                         event = eventFactory.createUnsignedEvent(data.getTopic(), data.getPayload());
-                        eventQueue.put(msgId, event);
                         break;
                     default:
                         if (data.getTopic().getJourneyType() != Hfp.Topic.JourneyType.signoff) {
@@ -88,12 +98,10 @@ public class DomainMappingWriter {
             case PAS:
             case WAIT:
                 event = eventFactory.createStopEvent(data.getTopic(), data.getPayload());
-                eventQueue.put(msgId, event);
                 break;
             case TLR:
             case TLA:
                 event = eventFactory.createLightPriorityEvent(data.getTopic(), data.getPayload());
-                eventQueue.put(msgId, event);
                 break;
             case DOO:
             case DOC:
@@ -104,17 +112,23 @@ public class DomainMappingWriter {
             case VJA:
             case VJOUT:
                 event = eventFactory.createOtherEvent(data.getTopic(), data.getPayload());
-                eventQueue.put(msgId, event);
                 break;
             default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
-        if (event != null) {
-            DWUpload.uploadBlob(event);
-        }
 
-        //Acknowledge all messages that were not inserted to the event queue to avoid them filling up Pulsar backlogs
-        if (event == null) {
+        if (event != null) {
+            //Do not insert data where the timestamp (tst) is too far away from the time when the message was received (received_at)
+            if (Duration.between(event.getTst().toInstant(), event.getReceived_at().toInstant()).compareTo(hfpTstMaxPast) < 0
+                    && Duration.between(event.getReceived_at().toInstant(), event.getTst().toInstant()).compareTo(hfpTstMaxFuture) < 0) {
+                eventQueue.put(msgId, event);
+            } else {
+                log.warn("tst for {} was outside accepted range of -{} to +{} days", event, hfpTstMaxPast, hfpTstMaxFuture);
+                ack(msgId);
+            }
+            DWUpload.uploadBlob(event);
+        } else {
+            //Acknowledge all messages that were not inserted to the event queue to avoid them filling up Pulsar backlogs
             ack(msgId);
         }
     }
