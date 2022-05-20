@@ -119,7 +119,8 @@ public class DomainMappingWriter {
 
         if (event != null) {
             //Do not insert data where the timestamp (tst) is too far away from the time when the message was received (received_at)
-            if (Duration.between(event.getTst().toInstant(), event.getReceived_at().toInstant()).compareTo(hfpTstMaxPast) < 0
+            if (event.getTst() != null
+                    && Duration.between(event.getTst().toInstant(), event.getReceived_at().toInstant()).compareTo(hfpTstMaxPast) < 0
                     && Duration.between(event.getReceived_at().toInstant(), event.getTst().toInstant()).compareTo(hfpTstMaxFuture) < 0) {
                 eventQueue.put(msgId, event);
             } else {
