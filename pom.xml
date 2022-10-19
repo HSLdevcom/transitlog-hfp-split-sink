@@ -7,7 +7,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <common.version>1.3.26</common.version>
+        <common.version>1.4.3</common.version>
     </properties>
 
     <repositories>
