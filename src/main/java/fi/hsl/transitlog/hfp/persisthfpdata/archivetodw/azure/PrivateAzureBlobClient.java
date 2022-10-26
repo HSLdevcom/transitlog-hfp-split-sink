@@ -11,12 +11,12 @@ public class PrivateAzureBlobClient extends AzureBlobClient {
     }
 
     void uploadFromFile(String filePath) {
-        BlobClient blobClient = blobContainerClient.getBlobClient(filePath);
+        BlobClient blobClient = getBlobContainerClient().getBlobClient(filePath);
         blobClient.uploadFromFile(filePath, true);
     }
 
     public boolean fileExists(String filePath) {
-        blobContainerClient.getBlobClient(filePath);
-        return blobContainerClient.exists();
+        getBlobContainerClient().getBlobClient(filePath);
+        return getBlobContainerClient().exists();
     }
 }
