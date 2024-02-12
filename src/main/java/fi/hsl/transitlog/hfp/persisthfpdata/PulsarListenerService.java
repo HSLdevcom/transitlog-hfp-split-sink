@@ -5,7 +5,7 @@ import fi.hsl.common.pulsar.*;
 import fi.hsl.common.config.ConfigParser;
 import lombok.extern.slf4j.*;
 
-
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.*;
@@ -42,7 +42,7 @@ public class PulsarListenerService {
     }
 
     private void recoverFromAlreadyClosedException() {
-        log.info("Attempting to recover from AlreadyClosedException by reinitializing PulsarApplication...");
+        log.info("Attempting to recover from AlreadyClosedException.");
         try {
             if (pulsarApplication != null) {
                 pulsarApplication.close();
