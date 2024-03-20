@@ -2,6 +2,7 @@ package fi.hsl.transitlog.hfp.persisthfpdata;
 
 import fi.hsl.common.pulsar.*;
 import lombok.extern.slf4j.*;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.scheduling.annotation.*;
@@ -26,6 +27,9 @@ public class PulsarListenerService {
     public void schedulePulsarApplicationListener() {
         try {
             pulsarApplication.launchWithHandler(messageProcessor);
+        } catch (PulsarClientException.AlreadyClosedException ace) {
+            log.info("Attempting to recover from AlreadyClosedException by terminating the app.");
+            System.exit(1);
         } catch (Exception e) {
             log.error("Error launching pulsar application", e);
             if (domainMappingWriter != null) {
