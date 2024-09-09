@@ -41,6 +41,25 @@ jobs:
           username: ${{ secrets.TRANSITLOG_DOCKERHUB_USER }}
           password: ${{ secrets.TRANSITLOG_DOCKERHUB_TOKEN }}
           tags: develop
+  build-develop-docker-image:
+    needs: test
+    runs-on: ubuntu-latest
+    # Run only on test branch
+    if: github.ref == 'refs/heads/test'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download .jar file
+        uses: actions/download-artifact@v3
+        with:
+          name: transitlog-hfp-split-sink.jar
+          path: target
+      - name: Build and publish test Docker image
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: hsldevcom/transitlog-hfp-split-sink
+          username: ${{ secrets.TRANSITLOG_DOCKERHUB_USER }}
+          password: ${{ secrets.TRANSITLOG_DOCKERHUB_TOKEN }}
+          tags: test
   build-release-docker-image:
     needs: test
     runs-on: ubuntu-latest
