@@ -41,7 +41,7 @@ jobs:
           username: ${{ secrets.TRANSITLOG_DOCKERHUB_USER }}
           password: ${{ secrets.TRANSITLOG_DOCKERHUB_TOKEN }}
           tags: develop
-  build-develop-docker-image:
+  build-test-docker-image:
     needs: test
     runs-on: ubuntu-latest
     # Run only on test branch
