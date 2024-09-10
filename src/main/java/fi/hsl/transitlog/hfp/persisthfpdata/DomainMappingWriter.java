@@ -82,12 +82,12 @@ public class DomainMappingWriter {
                         event = eventFactory.createVehiclePositionEvent(data.getTopic(), data.getPayload());
                         break;
                     case deadrun:
-                        try {
+                        /*try {
                             event = eventFactory.createUnsignedEvent(data.getTopic(), data.getPayload());
                         } catch (Exception e) {
                             log.error("UnsignedEvent error. Topic: {}, Payload: {}, Error: {}", data.getTopic(), data.getPayload(), e.getMessage(), e);
                             throw e;
-                        }
+                        }*/
                         break;
                     default:
                         if (data.getTopic().getJourneyType() != Hfp.Topic.JourneyType.signoff) {
