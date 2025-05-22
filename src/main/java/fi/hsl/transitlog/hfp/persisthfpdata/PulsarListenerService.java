@@ -1,10 +1,7 @@
 package fi.hsl.transitlog.hfp.persisthfpdata;
 
-import com.typesafe.config.Config;
 import fi.hsl.common.pulsar.*;
-import fi.hsl.common.config.ConfigParser;
 import lombok.extern.slf4j.*;
-
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
@@ -31,27 +28,13 @@ public class PulsarListenerService {
         try {
             pulsarApplication.launchWithHandler(messageProcessor);
         } catch (PulsarClientException.AlreadyClosedException ace) {
-            log.warn("Pulsar consumer already closed, attempting to recover...", ace);
-            recoverFromAlreadyClosedException();
+            log.info("Attempting to recover from AlreadyClosedException by terminating the app.");
+            System.exit(1);
         } catch (Exception e) {
             log.error("Error launching pulsar application", e);
             if (domainMappingWriter != null) {
                 domainMappingWriter.close(false);
             }
-        }
-    }
-
-    private void recoverFromAlreadyClosedException() {
-        log.info("Attempting to recover from AlreadyClosedException.");
-        try {
-            if (pulsarApplication != null) {
-                pulsarApplication.close();
-            }
-            Config config = ConfigParser.createConfig();
-            pulsarApplication = PulsarApplication.newInstance(config);
-            log.info("PulsarApplication reinitialized successfully.");
-        } catch (Exception e) {
-            log.error("Failed to recover from AlreadyClosedException", e);
         }
     }
 
