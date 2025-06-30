@@ -7,7 +7,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <common.version>2.0.3-RC6</common.version>
+        <common.version>2.0.3</common.version>
         <jackson.version>2.12.7</jackson.version>
     </properties>
 
