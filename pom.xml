@@ -7,7 +7,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <common.version>2.0.3</common.version>
+        <common.version>2.0.4</common.version>
         <jackson.version>2.12.7</jackson.version>
     </properties>
 
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.0</version>
+            <version>42.6.0</version>
         </dependency>
 
         <dependency>
