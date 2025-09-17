@@ -16,13 +16,11 @@ import java.util.function.*;
 
 @MappedSuperclass
 @EqualsAndHashCode
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = VehiclePosition.class, name = "vehicleposition"),
+@JsonSubTypes({@JsonSubTypes.Type(value = VehiclePosition.class, name = "vehicleposition"),
         @JsonSubTypes.Type(value = LightPriorityEvent.class, name = "lightpriorityevent"),
         @JsonSubTypes.Type(value = OtherEvent.class, name = "otherevent"),
         @JsonSubTypes.Type(value = StopEvent.class, name = "stopevent"),
-        @JsonSubTypes.Type(value = UnsignedEvent.class, name = "unsignedevent")
-})
+        @JsonSubTypes.Type(value = UnsignedEvent.class, name = "unsignedevent")})
 @Data
 @Slf4j
 public abstract class Event {
@@ -91,7 +89,8 @@ public abstract class Event {
         this.route_id = topic.hasRouteId() ? topic.getRouteId() : null;
         this.direction_id = topic.hasDirectionId() ? topic.getDirectionId() : null;
         this.headsign = topic.hasHeadsign() ? topic.getHeadsign() : null;
-        Optional<Time> maybeStartTime = wrapToOptional(topic::hasStartTime, topic::getStartTime).flatMap(HfpParser::safeParseTime);
+        Optional<Time> maybeStartTime = wrapToOptional(topic::hasStartTime, topic::getStartTime)
+                .flatMap(HfpParser::safeParseTime);
         this.journey_start_time = maybeStartTime.orElse(null);
         this.next_stop_id = topic.hasNextStop() ? topic.getNextStop() : null;
         this.geohash_level = topic.hasGeohashLevel() ? topic.getGeohashLevel() : null;
@@ -100,7 +99,8 @@ public abstract class Event {
         this.lat = payload.hasLat() ? payload.getLat() : null;
         this.longitude = payload.hasLong() ? payload.getLong() : null;
         this.desi = payload.hasDesi() ? payload.getDesi() : null;
-        Optional<Integer> maybeDirection = wrapToOptional(payload::hasDir, payload::getDir).flatMap(HfpParser::safeParseInt);
+        Optional<Integer> maybeDirection = wrapToOptional(payload::hasDir, payload::getDir)
+                .flatMap(HfpParser::safeParseInt);
         this.dir = maybeDirection.orElse(null);
         this.oper = payload.hasOper() ? payload.getOper() : null;
         this.veh = payload.hasVeh() ? payload.getVeh() : null;
@@ -110,13 +110,16 @@ public abstract class Event {
         this.acc = payload.hasAcc() ? payload.getAcc() : null;
         this.dl = payload.hasDl() ? payload.getDl() : null;
         this.odo = payload.hasOdo() ? payload.getOdo() : null;
-        Optional<Boolean> maybeDoors = wrapToOptional(payload::hasDrst, payload::getDrst).flatMap(HfpParser::safeParseBoolean);
+        Optional<Boolean> maybeDoors = wrapToOptional(payload::hasDrst, payload::getDrst)
+                .flatMap(HfpParser::safeParseBoolean);
         this.drst = maybeDoors.orElse(null);
-        Optional<java.sql.Date> maybeOperatingDay = wrapToOptional(payload::hasOday, payload::getOday).flatMap(HfpParser::safeParseDate);
+        Optional<java.sql.Date> maybeOperatingDay = wrapToOptional(payload::hasOday, payload::getOday)
+                .flatMap(HfpParser::safeParseDate);
         this.oday = maybeOperatingDay.orElse(null);
         this.jrn = payload.hasJrn() ? payload.getJrn() : null;
         this.line = payload.hasLine() ? payload.getLine() : null;
-        Optional<Time> maybeStart = wrapToOptional(payload::hasStart, payload::getStart).flatMap(HfpParser::safeParseTime);
+        Optional<Time> maybeStart = wrapToOptional(payload::hasStart, payload::getStart)
+                .flatMap(HfpParser::safeParseTime);
         this.start = maybeStart.orElse(null);
         this.location_quality_method = payload.hasLoc() ? payload.getLoc().toString() : null;
         this.stop = payload.hasStop() ? payload.getStop() : null;

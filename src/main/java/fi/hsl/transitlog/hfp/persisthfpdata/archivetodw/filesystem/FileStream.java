@@ -9,8 +9,7 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public
-class FileStream {
+public class FileStream {
     private final String csvFolder;
     private CSVMapper csvMapper;
     private Map<String, DWFile> dwFiles;

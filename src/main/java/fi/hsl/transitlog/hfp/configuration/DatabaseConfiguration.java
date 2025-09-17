@@ -17,11 +17,7 @@ import java.util.*;
 
 @Configuration
 @PropertySource({"classpath:application.properties"})
-@EnableJpaRepositories(
-        basePackages = "fi.hsl.transitlog.hfp.domain.repositories",
-        entityManagerFactoryRef = "devWriteEntityManager",
-        transactionManagerRef = "devWriteTransactionManager"
-)
+@EnableJpaRepositories(basePackages = "fi.hsl.transitlog.hfp.domain.repositories", entityManagerFactoryRef = "devWriteEntityManager", transactionManagerRef = "devWriteTransactionManager")
 @Profile(value = {"default", "dev"})
 @EnableTransactionManagement
 @EnableAsync
@@ -32,28 +28,22 @@ public class DatabaseConfiguration {
     @Bean
     @Primary
     public PlatformTransactionManager devWriteTransactionManager() {
-        JpaTransactionManager transactionManager
-                = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(
-                devWriteEntityManager().getObject());
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(devWriteEntityManager().getObject());
         return transactionManager;
     }
 
     @Bean
     @Primary
     public LocalContainerEntityManagerFactoryBean devWriteEntityManager() {
-        LocalContainerEntityManagerFactoryBean em
-                = new LocalContainerEntityManagerFactoryBean();
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(devWriteDataSource());
-        em.setPackagesToScan(
-                "fi.hsl.transitlog.hfp.domain");
+        em.setPackagesToScan("fi.hsl.transitlog.hfp.domain");
 
-        HibernateJpaVendorAdapter vendorAdapter
-                = new HibernateJpaVendorAdapter();
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.dialect",
-                env.getProperty("hibernate.dialect"));
+        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
         properties.put("hibernate.order_inserts", true);
         properties.put("hibernate.jdbc.batch_size", 5000);
         properties.put("hibernate.order_updates", true);
@@ -70,10 +60,8 @@ public class DatabaseConfiguration {
     @Bean
     @Primary
     public DataSource devWriteDataSource() {
-        HikariDataSource dataSource
-                = new HikariDataSource();
-        dataSource.setDriverClassName(
-                env.getProperty("jdbc.driverClassName"));
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
         dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
         dataSource.setUsername(env.getProperty("jdbc.user"));
         dataSource.setPassword(env.getProperty("jdbc.pass"));

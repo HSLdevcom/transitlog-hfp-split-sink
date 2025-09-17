@@ -1,12 +1,10 @@
 package fi.hsl.transitlog.hfp.persisthfpdata.archivetodw.azure;
 
-
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
 @Component
-public
-class AzureUploader {
+public class AzureUploader {
     final AzureBlobClient azureBlobClient;
     private final PrivateAzureBlobClient privateAzureBlobClient;
 
@@ -23,6 +21,5 @@ class AzureUploader {
         }
         return new AzureUploadTask(azureBlobClient, filePath).run();
     }
-
 
 }

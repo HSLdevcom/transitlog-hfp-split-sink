@@ -16,7 +16,8 @@ public class MessageProcessor implements IMessageHandler {
     private final HfpDataParser hfpDataParser;
     private DomainMappingWriter domainMappingWriter;
 
-    public MessageProcessor(DomainMappingWriter writer, TransitDataSchemaWrapper transitdataSchemaWrapper, HfpDataParser hfpDataParser) {
+    public MessageProcessor(DomainMappingWriter writer, TransitDataSchemaWrapper transitdataSchemaWrapper,
+            HfpDataParser hfpDataParser) {
         this.domainMappingWriter = writer;
         this.transitdataSchemaWrapper = transitdataSchemaWrapper;
         this.hfpDataParser = hfpDataParser;

@@ -33,8 +33,8 @@ class LazyDWServiceTest extends AbstractPodamTest {
         file.createNewFile();
         blobClientWrapper = mock(AzureBlobClient.class);
         privateBlobClient = mock(PrivateAzureBlobClient.class);
-        this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder, 3, true);
-
+        this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder,
+                3, true);
 
         when(privateBlobClient.fileExists(any())).thenReturn(true);
         when(blobClientWrapper.fileExists(any())).thenReturn(true);
@@ -53,9 +53,7 @@ class LazyDWServiceTest extends AbstractPodamTest {
     }
 
     private void verifyFileDeleted(File file) {
-        await()
-                .atMost(60, TimeUnit.SECONDS)
-                .pollDelay(5, TimeUnit.SECONDS)
+        await().atMost(60, TimeUnit.SECONDS).pollDelay(5, TimeUnit.SECONDS)
                 .untilAsserted(() -> assertTrue("File is not deleted", !file.exists()));
     }
 
@@ -103,20 +101,8 @@ class LazyDWServiceTest extends AbstractPodamTest {
 
     }
 
-
     @AfterEach
     void cleanUp() throws IOException {
         FileUtils.forceDelete(file.getParentFile().getParentFile());
     }
 }
-
-
-
-
-
-
-
-
-
-
-

@@ -19,38 +19,28 @@ import java.util.HashMap;
 @Configuration
 @EnableTransactionManagement
 @Profile(value = "integration-test")
-@EnableJpaRepositories(
-        basePackages = "fi.hsl.transitlog.hfp.domain.repositories",
-        entityManagerFactoryRef = "entityManager"
-)
+@EnableJpaRepositories(basePackages = "fi.hsl.transitlog.hfp.domain.repositories", entityManagerFactoryRef = "entityManager")
 public class H2Configuration {
     @Autowired
     private Environment env;
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        JpaTransactionManager transactionManager
-                = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(
-                entityManager().getObject());
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManager().getObject());
         return transactionManager;
     }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManager() {
-        LocalContainerEntityManagerFactoryBean em
-                = new LocalContainerEntityManagerFactoryBean();
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(
-                "fi.hsl.transitlog.hfp.domain");
-        HibernateJpaVendorAdapter vendorAdapter
-                = new HibernateJpaVendorAdapter();
+        em.setPackagesToScan("fi.hsl.transitlog.hfp.domain");
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto",
-                env.getProperty("hibernate.hbm2ddl.auto"));
-        properties.put("hibernate.dialect",
-                env.getProperty("hibernate.dialect"));
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
         em.setJpaPropertyMap(properties);
 
         return em;
@@ -58,10 +48,8 @@ public class H2Configuration {
 
     @Bean
     public DataSource dataSource() {
-        HikariDataSource dataSource
-                = new HikariDataSource();
-        dataSource.setDriverClassName(
-                env.getProperty("jdbc.driverClassName"));
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
         dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
         dataSource.setAutoCommit(false);
         return dataSource;
