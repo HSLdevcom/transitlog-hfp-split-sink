@@ -17,7 +17,8 @@ public class PulsarListenerService {
     private MessageProcessor messageProcessor;
 
     @Autowired
-    public PulsarListenerService(DomainMappingWriter domainMappingWriter, PulsarApplication pulsarApplication, MessageProcessor messageProcessor) {
+    public PulsarListenerService(DomainMappingWriter domainMappingWriter, PulsarApplication pulsarApplication,
+            MessageProcessor messageProcessor) {
         this.domainMappingWriter = domainMappingWriter;
         this.pulsarApplication = pulsarApplication;
         this.messageProcessor = messageProcessor;

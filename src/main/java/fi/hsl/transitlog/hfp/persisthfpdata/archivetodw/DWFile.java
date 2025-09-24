@@ -36,7 +36,6 @@ public class DWFile {
         fileCreatedAt = dwFilename.fileTimeStampNow();
     }
 
-
     public DWFile(File file) throws ParseException {
         this.filePath = file.getPath();
         this.file = file;
@@ -61,7 +60,6 @@ public class DWFile {
         return file.lastModified();
     }
 
-
     @Override
     public int hashCode() {
         return filePath.hashCode() * 31;
@@ -76,8 +74,7 @@ public class DWFile {
     }
 
     @NoArgsConstructor
-    static
-    class DWFileName {
+    static class DWFileName {
         //Hours 0-23
         private static final String DW_FILE_DATEFORMAT = "yyyy-MM-dd";
         private static final String TIMEZONE = "Europe/Helsinki";
@@ -93,8 +90,10 @@ public class DWFile {
         }
 
         private static String eventDateInDWFormat(Event event) {
-            LocalDateTime tstLocalizedDateTime = event.getTst().toInstant().atZone(ZoneId.of(DWFileName.TIMEZONE)).toLocalDateTime();
-            DateTimeFormatter year_month_day_format = DateTimeFormatter.ofPattern(DWFileName.DW_FILE_DATEFORMAT, Locale.ENGLISH);
+            LocalDateTime tstLocalizedDateTime = event.getTst().toInstant().atZone(ZoneId.of(DWFileName.TIMEZONE))
+                    .toLocalDateTime();
+            DateTimeFormatter year_month_day_format = DateTimeFormatter.ofPattern(DWFileName.DW_FILE_DATEFORMAT,
+                    Locale.ENGLISH);
             return year_month_day_format.format(tstLocalizedDateTime);
         }
 

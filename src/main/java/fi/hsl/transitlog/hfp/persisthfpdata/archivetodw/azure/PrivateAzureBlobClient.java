@@ -6,7 +6,8 @@ import org.springframework.stereotype.*;
 
 @Component
 public class PrivateAzureBlobClient extends AzureBlobClient {
-    PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString, @Value("${blobstorage.privateblobcontainer}") String blobContainer) {
+    PrivateAzureBlobClient(@Value("${blobstorage.connectionString}") String connectionString,
+            @Value("${blobstorage.privateblobcontainer}") String blobContainer) {
         super(connectionString, blobContainer);
     }
 

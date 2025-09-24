@@ -36,7 +36,7 @@ public class LightPriorityEvent extends Event {
         this.tlp_line_configid = payload.hasTlpLineConfigid() ? payload.getTlpLineConfigid() : null;
         this.tlp_point_configid = payload.hasTlpPointConfigid() ? payload.getTlpPointConfigid() : null;
         this.tlp_frequency = payload.hasTlpFrequency() ? payload.getTlpFrequency() : null;
-        this.tlp_protocol = payload.hasTlpProtocol  () ? payload.getTlpProtocol() : null;
+        this.tlp_protocol = payload.hasTlpProtocol() ? payload.getTlpProtocol() : null;
     }
 
     public LightPriorityEvent() {
