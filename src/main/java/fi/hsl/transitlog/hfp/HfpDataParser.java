@@ -5,8 +5,7 @@ import fi.hsl.common.hfp.proto.Hfp;
 import org.springframework.stereotype.Component;
 
 @Component
-public
-class HfpDataParser {
+public class HfpDataParser {
     public Hfp.Data parseFrom(byte[] data) throws InvalidProtocolBufferException {
         return Hfp.Data.parseFrom(data);
     }

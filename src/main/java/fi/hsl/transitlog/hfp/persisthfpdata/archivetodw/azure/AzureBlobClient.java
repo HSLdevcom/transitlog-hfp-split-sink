@@ -11,10 +11,9 @@ public class AzureBlobClient {
 
     private BlobContainerClient blobContainerClient;
 
-    AzureBlobClient(@Value(value = "${blobstorage.connectionString}") String connectionString, @Value(value = "${blobstorage.blobcontainer}") String blobContainer) {
-        this.blobServiceClient = new BlobServiceClientBuilder()
-                .connectionString(connectionString)
-                .buildClient();
+    AzureBlobClient(@Value(value = "${blobstorage.connectionString}") String connectionString,
+            @Value(value = "${blobstorage.blobcontainer}") String blobContainer) {
+        this.blobServiceClient = new BlobServiceClientBuilder().connectionString(connectionString).buildClient();
 
         this.blobContainer = blobContainer;
     }
@@ -41,4 +40,3 @@ public class AzureBlobClient {
         return getBlobContainerClient().exists();
     }
 }
-

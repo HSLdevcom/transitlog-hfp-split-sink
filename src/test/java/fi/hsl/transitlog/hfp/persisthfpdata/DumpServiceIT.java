@@ -27,11 +27,9 @@ class DumpServiceIT {
     void dump() {
         //TODO Keksi tapa lähettää brokerille viestiä
 
-        List<Event> all =
-                eventRepository.findAll();
+        List<Event> all = eventRepository.findAll();
 
         //TODO Assertoi mitä meni kantaan
     }
-
 
 }

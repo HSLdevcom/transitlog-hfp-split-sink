@@ -36,9 +36,11 @@ public class LazyDWService implements DWUpload {
     private boolean enabled;
 
     @Autowired
-    LazyDWService(AzureUploader azureUploader, @Value("${fileLastModifiedInSecondsBuffer:1800}")
-            Integer fileLastModifiedInSecondsBuffer, @Value("${filepath:csv}")
-                          String filePath, @Value("${delayBeforeFileDeletionSeconds:1800}") Integer delayBeforeFileDeletionSeconds, @Value("${csvUploadEnabled:true}") Boolean enabled) throws ParseException {
+    LazyDWService(AzureUploader azureUploader,
+            @Value("${fileLastModifiedInSecondsBuffer:1800}") Integer fileLastModifiedInSecondsBuffer,
+            @Value("${filepath:csv}") String filePath,
+            @Value("${delayBeforeFileDeletionSeconds:1800}") Integer delayBeforeFileDeletionSeconds,
+            @Value("${csvUploadEnabled:true}") Boolean enabled) throws ParseException {
         this.fileLastModifiedInSecondsBuffer = fileLastModifiedInSecondsBuffer;
         this.delayBeforeFileDeletion = delayBeforeFileDeletionSeconds;
         this.filePath = filePath;
@@ -64,10 +66,8 @@ public class LazyDWService implements DWUpload {
     }
 
     private Set<DWFile> filterSuitableUploads() {
-        return dwFileSet.stream()
-                .filter(dwFile -> dwFile.fileSuitableForUpload(fileLastModifiedInSecondsBuffer))
-                .map(this::uploadFile)
-                .collect(Collectors.toSet());
+        return dwFileSet.stream().filter(dwFile -> dwFile.fileSuitableForUpload(fileLastModifiedInSecondsBuffer))
+                .map(this::uploadFile).collect(Collectors.toSet());
     }
 
     private DWFile uploadFile(DWFile dwFile) {

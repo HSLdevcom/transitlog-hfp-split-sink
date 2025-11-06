@@ -10,8 +10,7 @@ public class CSVMapper {
         CsvMapper schemaMapper = new CsvMapper();
         CsvSchema schema = schemaMapper.typedSchemaFor(event.getClass());
         ObjectWriter writer = schemaMapper.writer(schema);
-        return
-                writer.writeValueAsString(event);
+        return writer.writeValueAsString(event);
 
     }
 }
