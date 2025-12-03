@@ -1,7 +1,4 @@
-FROM eclipse-temurin:11-alpine
-
-#Install curl for health check
-RUN apk add --no-cache curl
+FROM infodevops-docker-base-images:1.0.0-java-25
 
 ADD target/transitlog-hfp-split-sink.jar /usr/app/transitlog-hfp-split-sink.jar
 COPY run /run
