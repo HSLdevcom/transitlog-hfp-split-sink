@@ -4,14 +4,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import fi.hsl.common.hfp.proto.*;
 import fi.hsl.common.pulsar.*;
 import fi.hsl.transitlog.hfp.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.*;
 import org.slf4j.*;
 import org.springframework.stereotype.*;
 
 @Component
+@Slf4j
 public class MessageProcessor implements IMessageHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(MessageProcessor.class);
     private final TransitDataSchemaWrapper transitdataSchemaWrapper;
     private final HfpDataParser hfpDataParser;
     private DomainMappingWriter domainMappingWriter;

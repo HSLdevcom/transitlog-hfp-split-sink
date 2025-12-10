@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.*;
 
-import javax.persistence.*;
 import java.io.*;
 import java.text.*;
 import java.time.Duration;
@@ -28,7 +27,6 @@ public class DomainMappingWriter {
     private final DumpService dumpTask;
     private final DWUpload DWUpload;
     private final EventFactory eventFactory;
-    private EntityManager entityManager;
     private PulsarApplication pulsarApplication;
     private Consumer<byte[]> consumer;
 
@@ -49,13 +47,12 @@ public class DomainMappingWriter {
     };
 
     @Autowired
-    DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication, EntityManager entityManager,
-            DumpService dumpTask, EventFactory eventFactory, @Value(value = "${hfp.tstMaxPast}") Integer hfpTstMaxPast,
-            @Value(value = "${hfp.tstMaxFuture}") Integer hfpTstMaxFuture) {
+    DomainMappingWriter(DWUpload dwUpload, PulsarApplication pulsarApplication,
+                        DumpService dumpTask, EventFactory eventFactory, @Value(value = "${hfp.tstMaxPast}") Integer hfpTstMaxPast,
+                        @Value(value = "${hfp.tstMaxFuture}") Integer hfpTstMaxFuture) {
         this.DWUpload = dwUpload;
         eventQueue = new ConcurrentHashMap<>();
         this.dumpTask = dumpTask;
-        this.entityManager = entityManager;
         this.pulsarApplication = pulsarApplication;
         this.consumer = pulsarApplication.getContext().getConsumer();
         this.eventFactory = eventFactory;
@@ -72,44 +69,44 @@ public class DomainMappingWriter {
     void process(MessageId msgId, Hfp.Data data) throws IOException, ParseException {
         Event event = null;
         switch (data.getTopic().getEventType()) {
-            case VP :
+            case VP:
                 switch (data.getTopic().getJourneyType()) {
-                    case journey :
+                    case journey:
                         event = eventFactory.createVehiclePositionEvent(data.getTopic(), data.getPayload());
                         break;
-                    case deadrun :
+                    case deadrun:
                         event = eventFactory.createUnsignedEvent(data.getTopic(), data.getPayload());
                         break;
-                    default :
+                    default:
                         if (data.getTopic().getJourneyType() != Hfp.Topic.JourneyType.signoff) {
                             log.warn("Received unknown journey type {}", data.getTopic().getJourneyType());
                         }
                 }
                 break;
-            case DUE :
-            case ARR :
-            case ARS :
-            case PDE :
-            case DEP :
-            case PAS :
-            case WAIT :
+            case DUE:
+            case ARR:
+            case ARS:
+            case PDE:
+            case DEP:
+            case PAS:
+            case WAIT:
                 event = eventFactory.createStopEvent(data.getTopic(), data.getPayload());
                 break;
-            case TLR :
-            case TLA :
+            case TLR:
+            case TLA:
                 event = eventFactory.createLightPriorityEvent(data.getTopic(), data.getPayload());
                 break;
-            case DOO :
-            case DOC :
-            case DA :
-            case DOUT :
-            case BA :
-            case BOUT :
-            case VJA :
-            case VJOUT :
+            case DOO:
+            case DOC:
+            case DA:
+            case DOUT:
+            case BA:
+            case BOUT:
+            case VJA:
+            case VJOUT:
                 event = eventFactory.createOtherEvent(data.getTopic(), data.getPayload());
                 break;
-            default :
+            default:
                 log.warn("Received HFP message with unknown event type: {}", data.getTopic().getEventType());
         }
 
@@ -117,9 +114,9 @@ public class DomainMappingWriter {
             //Do not insert data where the timestamp (tst) is too far away from the time when the message was received (received_at)
             if (event.getTst() != null
                     && Duration.between(event.getTst().toInstant(), event.getReceived_at().toInstant())
-                            .compareTo(hfpTstMaxPast) < 0
+                    .compareTo(hfpTstMaxPast) < 0
                     && Duration.between(event.getReceived_at().toInstant(), event.getTst().toInstant())
-                            .compareTo(hfpTstMaxFuture) < 0) {
+                    .compareTo(hfpTstMaxFuture) < 0) {
                 eventQueue.put(msgId, event);
             } else {
                 log.warn("tst for {} was outside accepted range of -{} to +{} days", event, hfpTstMaxPast,

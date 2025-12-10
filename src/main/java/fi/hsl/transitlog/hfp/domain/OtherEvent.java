@@ -1,8 +1,8 @@
 package fi.hsl.transitlog.hfp.domain;
 import fi.hsl.common.hfp.proto.Hfp;
 
+import jakarta.persistence.Entity;
 import lombok.Data;
-import javax.persistence.Entity;
 
 @Data
 @Entity

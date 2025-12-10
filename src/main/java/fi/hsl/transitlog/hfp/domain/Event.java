@@ -3,10 +3,13 @@ package fi.hsl.transitlog.hfp.domain;
 import com.fasterxml.jackson.annotation.*;
 import fi.hsl.common.hfp.*;
 import fi.hsl.common.hfp.proto.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import lombok.*;
 import lombok.extern.slf4j.*;
 
-import javax.persistence.*;
 import java.math.*;
 import java.sql.*;
 import java.time.*;
