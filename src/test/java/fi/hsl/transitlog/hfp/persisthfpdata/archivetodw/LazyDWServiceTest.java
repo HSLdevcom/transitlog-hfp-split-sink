@@ -13,15 +13,19 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static org.awaitility.Awaitility.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.*;
 
 class LazyDWServiceTest extends AbstractPodamTest {
     private LazyDWService lazyBlobStorage;
-    private AzureBlobClient blobClientWrapper;
     private File file;
-    private PrivateAzureBlobClient privateBlobClient;
+
+    private static final String CONNECTION_STRING =
+            "DefaultEndpointsProtocol=https;" +
+                    "AccountName=faketestaccount;" +
+                    "AccountKey=Eby8vdM02xNOcqFeqC7aK1z6xwZxP0sJ4YJ7Yq9s8xk=;" +
+                    "EndpointSuffix=core.windows.net";
+
+    private static final String BLOB_CONTAINER = "MOCK";
 
     @BeforeEach
     void setUp() throws IOException, ParseException {
@@ -31,13 +35,10 @@ class LazyDWServiceTest extends AbstractPodamTest {
         file = new File(fileFolder + "/VehiclePosition/2010-01-02-02-hfp.csv");
         file.getParentFile().mkdirs();
         file.createNewFile();
-        blobClientWrapper = mock(AzureBlobClient.class);
-        privateBlobClient = mock(PrivateAzureBlobClient.class);
+        AzureBlobClient blobClientWrapper = new MockAzureBlockClient(CONNECTION_STRING, BLOB_CONTAINER);
+        PrivateAzureBlobClient privateBlobClient = new MockPrivateAzureBlobClient(CONNECTION_STRING, BLOB_CONTAINER);
         this.lazyBlobStorage = new LazyDWService(new AzureUploader(blobClientWrapper, privateBlobClient), 1, fileFolder,
                 3, true);
-
-        when(privateBlobClient.fileExists(any())).thenReturn(true);
-        when(blobClientWrapper.fileExists(any())).thenReturn(true);
     }
 
     @Test

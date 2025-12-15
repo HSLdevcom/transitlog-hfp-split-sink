@@ -11,7 +11,7 @@ public class AzureBlobClient {
 
     private BlobContainerClient blobContainerClient;
 
-    AzureBlobClient(@Value(value = "${blobstorage.connectionString}") String connectionString,
+    protected AzureBlobClient(@Value(value = "${blobstorage.connectionString}") String connectionString,
             @Value(value = "${blobstorage.blobcontainer}") String blobContainer) {
         this.blobServiceClient = new BlobServiceClientBuilder().connectionString(connectionString).buildClient();
 
@@ -30,7 +30,7 @@ public class AzureBlobClient {
         return blobContainerClient;
     }
 
-    void uploadFromFile(String filePath) {
+    protected void uploadFromFile(String filePath) {
         BlobClient blobClient = getBlobContainerClient().getBlobClient(filePath);
         blobClient.uploadFromFile(filePath, true);
     }
