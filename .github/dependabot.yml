@@ -4,22 +4,22 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    target-branch: "develop"
+    target-branch: "master"
     open-pull-requests-limit: 2
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-    target-branch: "develop"
+    target-branch: "master"
     open-pull-requests-limit: 2
 
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "daily"
-    target-branch: "develop"
+    target-branch: "master"
     open-pull-requests-limit: 5
     ignore:
       - dependency-name: "hsldevcom/infodevops-docker-base-images"
-        versions: [ "<1.0.0-25-java" ]
+        versions: [ "<1.0.1-25-java" ]
