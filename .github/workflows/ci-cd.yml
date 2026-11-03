@@ -20,6 +20,28 @@ jobs:
     with:
       runTestsInsideDocker: true
 
+  diagnose-maven:
+    name: Diagnose Maven version validation
+    needs: ci-cd
+    if: ${{ always() && needs.ci-cd.result == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Evaluate Java version with Maven diagnostics
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          JAVA_TOOL_OPTIONS: ""
+          MAVEN_OPTS: ""
+        run: mvn -e -DforceStdout -Dstyle.color=never help:evaluate -Dexpression=maven.compiler.release
+
   publish-edge:
     name: Publish edge Docker tag
     needs: ci-cd
