@@ -19,11 +19,8 @@ class LazyDWServiceTest extends AbstractPodamTest {
     private LazyDWService lazyBlobStorage;
     private File file;
 
-    private static final String CONNECTION_STRING =
-            "DefaultEndpointsProtocol=https;" +
-                    "AccountName=faketestaccount;" +
-                    "AccountKey=Eby8vdM02xNOcqFeqC7aK1z6xwZxP0sJ4YJ7Yq9s8xk=;" +
-                    "EndpointSuffix=core.windows.net";
+    private static final String CONNECTION_STRING = "DefaultEndpointsProtocol=https;" + "AccountName=faketestaccount;"
+            + "AccountKey=Eby8vdM02xNOcqFeqC7aK1z6xwZxP0sJ4YJ7Yq9s8xk=;" + "EndpointSuffix=core.windows.net";
 
     private static final String BLOB_CONTAINER = "MOCK";
 

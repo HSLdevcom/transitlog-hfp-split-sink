@@ -13,7 +13,6 @@ public class MockAzureBlockClient extends AzureBlobClient {
         return true;
     }
 
-
     @Override
     protected void uploadFromFile(String filePath) {
         // no-op
