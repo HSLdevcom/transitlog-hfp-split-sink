@@ -1,0 +1,40 @@
+name: CI/CD
+
+permissions:
+  contents: read
+  packages: read
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+  merge_group:
+
+jobs:
+  ci-cd:
+    uses: HSLdevcom/transitdata-shared-workflows/.github/workflows/ci-cd-java.yml@main
+    secrets: inherit
+    with:
+      runTestsInsideDocker: true
+
+  publish-edge:
+    name: Publish edge Docker tag
+    needs: ci-cd
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: docker-hub-release
+    permissions:
+      contents: read
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_INFODEVOPS_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_INFODEVOPS_TOKEN }}
+      - name: Tag the main image as edge
+        run: docker buildx imagetools create --tag hsldevcom/transitlog-hfp-split-sink:edge hsldevcom/transitlog-hfp-split-sink:main

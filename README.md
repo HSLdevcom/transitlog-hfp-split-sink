@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/HSLdevcom/transitlog-hfp-split-sink.svg?branch=master)](https://travis-ci.org/HSLdevcom/transitlog-hfp-split-sink)
+# transitlog-hfp-split-sink [![CI/CD](https://github.com/HSLdevcom/transitlog-hfp-split-sink/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/HSLdevcom/transitlog-hfp-split-sink/actions/workflows/ci-cd.yml)
 
 ## Description
 
@@ -20,7 +20,7 @@ Either use released versions from public maven repository or build your own and 
 
 ### Docker image
 
-- Run [this script](build-image.sh) to build the Docker image
+- Run [this script](build-image.sh) to build and push the Docker image. It defaults to the `edge` tag; set `DOCKER_TAG` to override it.
 
 
 ## Running

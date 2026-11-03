@@ -1,9 +1,9 @@
 name: "Code analysis"
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
   schedule:
     - cron: '0 8 * * *'
 jobs:
@@ -21,6 +21,8 @@ jobs:
         include:
           - language: actions
             build-mode: none
+          - language: java-kotlin
+            build-mode: manual
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,6 +31,19 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+      - name: Set up Java 25
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Build Java sources for CodeQL
+        if: matrix.language == 'java-kotlin'
+        run: ./mvnw --batch-mode --no-transfer-progress -s .mvn/settings.xml -DskipTests compile
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:

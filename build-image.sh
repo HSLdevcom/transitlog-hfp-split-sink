@@ -3,12 +3,10 @@
 set -e
 
 ORG=${ORG:-hsldevcom}
-DOCKER_TAG=develop
+DOCKER_TAG=${DOCKER_TAG:-edge}
 DOCKER_IMAGE=$ORG/transitlog-hfp-split-sink:${DOCKER_TAG}
-DOCKER_IMAGE_LATEST=$ORG/transitlog-hfp-split-sink:develop
 
-docker build -t $DOCKER_IMAGE .
+docker build -t "$DOCKER_IMAGE" .
 
-docker tag $DOCKER_IMAGE $DOCKER_IMAGE_LATEST
 docker login
-docker push $DOCKER_IMAGE_LATEST
+docker push "$DOCKER_IMAGE"
