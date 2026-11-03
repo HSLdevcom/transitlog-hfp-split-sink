@@ -8,4 +8,24 @@
             <password>${env.GITHUB_TOKEN}</password>
         </server>
     </servers>
+    <profiles>
+        <profile>
+            <id>maven-central</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <url>https://repo.maven.apache.org/maven2</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>maven-central</activeProfile>
+    </activeProfiles>
 </settings>
