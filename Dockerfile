@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-FROM hsldevcom/infodevops-docker-base-images:1.0.2-25-java-jdk AS build
+FROM hsldevcom/infodevops-docker-base-images:1.1.1-25-java-jdk AS build
 
 WORKDIR /usr/app
 ARG GITHUB_ACTOR=github-actions
@@ -19,7 +19,7 @@ RUN --mount=type=secret,id=github_token \
     export GITHUB_TOKEN GITHUB_ACTOR && \
     ./mvnw -B package -DskipTests
 
-FROM hsldevcom/infodevops-docker-base-images:1.0.2-25-java-jre
+FROM hsldevcom/infodevops-docker-base-images:1.1.1-25-java-jre
 
 WORKDIR /usr/app
 COPY --from=build /usr/app/target/transitlog-hfp-split-sink.jar /usr/app/transitlog-hfp-split-sink.jar
